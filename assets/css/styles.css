@@ -290,14 +290,21 @@ section.block {
 
 /* ============================= CHASSIS ============================= */
 .chassis {
-  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
+  flex: 1.25;
+  display: grid;
+  grid-template-columns: 14.7% 1fr;
+  gap: 1rem;
+
+  height: 100%;
+  aspect-ratio: 1270 / 1069;
+  background-image: url("../img/nas-desktop.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 22px;
-  display: grid;
-  grid-template-columns: 168px 1fr;
-  gap: 26px;
 }
+
 @media (max-width: 760px) {
   .chassis {
     grid-template-columns: 1fr;
@@ -305,23 +312,12 @@ section.block {
 }
 
 .chassis-rail {
-  background: #0c1120;
+  margin: 5rem 0.25rem 8rem 0.25rem;
+  padding: 16px 14px;
+  background: #252525;
+
   border: 1px solid var(--border-soft);
   border-radius: 14px;
-  padding: 16px 14px;
-}
-.rail-brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin-bottom: 2px;
-}
-.rail-sub {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--text-dim);
-  letter-spacing: 0.1em;
-  margin-bottom: 14px;
 }
 .rail-row {
   display: flex;
@@ -353,9 +349,13 @@ section.block {
   margin: 10px 0;
 }
 
+.chassis-disks {
+  margin-block: 2rem;
+  padding: 1rem;
+}
 .bay-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   align-content: start;
 }
@@ -366,7 +366,7 @@ section.block {
 }
 
 .bay {
-  aspect-ratio: 3/4;
+  aspect-ratio: 455/139;
   border-radius: 10px;
   border: 1px dashed var(--border);
   display: flex;
@@ -381,7 +381,7 @@ section.block {
 .bay.filled {
   border: 1px solid var(--border);
   border-style: solid;
-  background-image: url("../img/disc-inserted.png");
+  background-image: url("../img/disc-inserted.webp");
   background-size: cover;
   background-position: center;
   color: #fff;
