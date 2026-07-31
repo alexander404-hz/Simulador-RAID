@@ -377,7 +377,7 @@ section.block {
 .bay.filled {
   border: 1px solid var(--border);
   border-style: solid;
-  background-image: url("../../img/disc-inserted.png");
+  background-image: url("../img/disc-inserted.png");
   background-size: cover;
   background-position: center;
   color: #fff;

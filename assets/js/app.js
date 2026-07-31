@@ -37,7 +37,7 @@ function pintarPaleta() {
   cont.innerHTML = TAMANOS.map(
     (gb) => `
     <button class="disk-card" ${discos.length >= MAX_BAHIAS ? "disabled" : ""} onclick="agregarDisco(${gb})" aria-label="Insertar disco de ${formatoCapacidad(gb)}">
-      <img src="img/disco.png" alt="">
+      <img src="assets/img/disco.png" alt="">
       <span>${formatoCapacidad(gb)}</span>
       <small>insertar</small>
     </button>
