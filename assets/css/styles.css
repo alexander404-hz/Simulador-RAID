@@ -269,6 +269,9 @@ section.block {
   cursor: not-allowed;
   transform: none;
 }
+.disk-card {
+  color: var(--text);
+}
 .disk-card img {
   width: 56px;
   height: auto;
@@ -278,6 +281,7 @@ section.block {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 0.86rem;
+  color: var(--text);
 }
 .disk-card small {
   color: var(--text-dim);
