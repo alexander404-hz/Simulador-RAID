@@ -1,0 +1,228 @@
+/*ZONA PARA SELECCIONAR DISCOS*/
+#area_discos {
+  margin-bottom: 40px;
+  padding: 10px;
+}
+
+#lista_discos ul {
+  margin: 3px;
+  padding: 3px;
+
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+
+  list-style: none;
+}
+
+#lista_discos .hdd {
+  width: 98px;
+  height: 100px;
+
+  margin: 0 5px 10px 5px;
+
+  border: none;
+
+  background-image: url("../img/disco.png");
+  background-size: 98px 100px;
+  background-repeat: no-repeat;
+  background-color: transparent;
+
+  cursor: pointer;
+
+  padding-top: 1px;
+  padding-bottom: 15px;
+  padding-left: 1px;
+  padding-right: 1px;
+
+  display: block;
+
+  font-weight: bold;
+  font-size: medium;
+  text-shadow: 1px 1px 1px black;
+  color: rgb(255, 255, 255);
+}
+
+/*ZONA PARA MOSTRAR DISCOS EN EL NAS*/
+#area_nas {
+  width: 100%;
+  max-width: 877px;
+  height: 684px;
+
+  margin: 0 auto;
+
+  position: relative;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+
+  background-image: url(../img/nas-desktop-empty.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+#area_nas:after {
+  content: "";
+  display: block;
+  padding-bottom: 34.5283%;
+}
+
+#lista_ranuras ul {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  position: absolute;
+
+  width: 100%;
+
+  margin: 0;
+
+  padding-top: 208px;
+  padding-right: 8.8%;
+  padding-bottom: 76px;
+  padding-left: 19.84%;
+
+  display: flex;
+  flex-flow: row;
+
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  list-style: none;
+}
+
+#lista_ranuras .hdd {
+  width: 15.9%;
+  min-width: 7.33173%;
+  height: 100%;
+
+  margin: 0;
+  margin-right: 0.9%;
+
+  border: 1px solid transparent;
+
+  position: relative;
+  flex-shrink: 0;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#lista_ranuras .hdd.placeholder {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#lista_ranuras .hdd.online {
+  background-image: url(../img/disc-inserted.png);
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: 0;
+
+  text-align: center;
+  font-weight: bold;
+  font-size: medium;
+  color: rgb(255, 255, 255);
+}
+
+#lista_ranuras .hdd.online span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30%;
+  text-align: center;
+}
+
+#lista_ranuras .hdd.online button {
+  bottom: 6px;
+  left: 0;
+  right: 0;
+
+  position: absolute;
+
+  width: 50%;
+  height: 22%;
+
+  cursor: pointer;
+
+  background-color: transparent;
+
+  display: block;
+
+  font-weight: bold;
+  font-size: medium;
+  color: rgb(255, 255, 255);
+}
+
+/*ZONA DE RESULTADOS*/
+
+#resultados {
+  margin: 20px;
+  padding: 10px;
+}
+
+/*ZONA FOOTER*/
+footer {
+  width: 100%;
+  margin: 1px 0;
+  padding: 2em 0;
+  color: #c5c8cf;
+}
+
+footer a:link,
+footer a:visited {
+  color: #c5c8cf;
+}
+
+footer a:hover {
+  color: white;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 2px 16px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80% !important;
+  box-shadow:
+    0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+/* Add Animation */
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+#myModal img {
+  width: 300px;
+  height: 300px;
+}
