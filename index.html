@@ -1,323 +1,520 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Alexander Hz" />
+    <meta
+      name="description"
+      content="Simulador de arreglos RAID: arma un arreglo virtual de discos y compara capacidad, redundancia y espacio disponible en tiempo real."
+    />
+    <meta
+      name="keywords"
+      content="RAID, arreglos de disco, HDD, NAS, simulador"
+    />
+    <title>Simulador RAID</title>
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="HS19011 y OC20013, grupo 16 arreglos RAID">
-    <meta name="copyright" content="Propietario de grupo 16 arreglos RAID">
-    <meta name="keywords" content="Arreglos, Disco, HDD, grupo16, RAID, grupo16ArreglosRAID">
-    <meta name="description"
-        content="En esta pagina se encuentra un simulador de arreglos RAID del grupo 16 de la materia ARC115">
-    <meta name="robots" content="index,follow">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-
-    <title>grupo16arreglosRAID</title>
-
-    <!-- CSS propio -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <!-- Iconos boostrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
 
-<body>
-    <header>
-        <nav class="navbar navbar-dark bg-dark">
-            <a class="navbar-brand ps-5" href="#">
-                <img src="img/Logo.png" width="239px" height="68px" alt="Logo grupo16RAID">
-            </a>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="wrap">
+        <div class="brand">
+          <span class="brand-mark">
+            <svg viewBox="0 0 22 22" width="20" height="20" aria-hidden="true">
+              <ellipse cx="11" cy="6.5" rx="9" ry="3" fill="#2dd4bf" />
+              <ellipse
+                cx="11"
+                cy="11"
+                rx="9"
+                ry="3"
+                fill="#ffb100"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="11"
+                cy="15.5"
+                rx="9"
+                ry="3"
+                fill="#e7ecf7"
+                opacity="0.35"
+              />
+            </svg>
+          </span>
+          Simulador RAID <small>NAS VIRTUAL</small>
+        </div>
+        <nav>
+          <a href="#builder">Discos</a>
+          <a href="#compare">Comparar</a>
         </nav>
+      </div>
     </header>
 
-    <div class="container mt-4 mb-4 bg-light rounded-3">
-        <section>
-            <div class="p-5 pb-4">
-                <h1 class="display-4">Simulador RAID</h1>
-                <p class="lead">ARC115 - Grupo 16.</p>
-                <hr class="my-4">
+    <main>
+      <section class="hero wrap">
+        <div class="eyebrow">Estado: en línea</div>
+        <h1>Arma tu arreglo de discos y mira cómo cambia cuando algo falla.</h1>
+        <p class="lead">
+          Elige discos, insértalos en la unidad NAS y compara al instante la
+          capacidad útil, el espacio destinado a seguridad y el que queda sin
+          usar en cada nivel RAID.
+        </p>
+        <div class="hero-actions">
+          <a href="#builder" class="btn btn-primary">Empezar a simular</a>
+          <button class="btn btn-ghost" id="myBtn">¿Qué es cada RAID?</button>
+        </div>
+      </section>
 
-                <p>Esta pagina tiene como finalidad poder presentar los arreglos RAID a cualquier persona interesada en esta tecnologia <br>
-                por lo que a continuacion se le presenta una breve expliacion sobre de que tratan estos arreglos y cual es su funcionalidad.</p>
+      <section class="block wrap" id="builder">
+        <div class="section-head">
+          <span class="tag">01</span>
+          <div>
+            <h2>Elige e inserta tus discos</h2>
+            <p>
+              Selecciona una capacidad para insertarla en la próxima bahía
+              libre. Puedes combinar tamaños distintos: el arreglo siempre
+              calculará usando el disco más pequeño como referencia.
+            </p>
+          </div>
+        </div>
 
-                <p>Si desea conocer mas sobre los RAID, haga clic aqui en el siguiente boton</p>
-                <button class="btn btn-secondary" id="myBtn">Informe sobre RAID</button>
+        <div class="disk-palette" id="paleta-discos">
+          <!-- generado por JS -->
+        </div>
 
-                <br><br><br>
+        <div class="chassis">
+          <div class="chassis-rail">
+            <div class="rail-brand">NAS</div>
+            <div class="rail-sub">ALMACENAMIENTO EN RED</div>
+            <div class="rail-row on"><span class="dot"></span>STATUS</div>
+            <div class="rail-row on"><span class="dot"></span>LAN 1</div>
+            <div class="rail-row on"><span class="dot"></span>LAN 2</div>
+            <div class="rail-divider"></div>
+            <div id="rail-disks"><!-- 12 filas DISK n generadas por JS --></div>
+          </div>
 
-                <!-- The Modal -->
-                <div id="myModal" class="modal">
-
-                    <!-- Modal content -->
-                    <!-- Modal content -->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <span class="close">&times;</span>
-                            <h2>RAIDS</h2>
-                        </div>
-                        <div class="modal-body">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <p><strong>RAID 0: </strong>También llamado volumen dividido (Striping), no
-                                            tiene paridad ni redundancia,
-                                            por lo que, si falla una de las unidades de almacenamiento, perderemos todos
-                                            los datos que había en su
-                                            interior, a menos que tengamos realizadas copias de seguridad externas. Este
-                                            arreglo realiza una
-                                            distribución equitativa de los bloques de datos entre los distintos discos
-                                            que lo componen. Es importante
-                                            señalar que el RAID 0 no era uno de los niveles RAID originales. El RAID 0
-                                            se usa habitualmente para
-                                            proporcionar un alto rendimiento de escritura ya que los datos se escriben
-                                            en dos o más discos de forma
-                                            paralela, aunque un mismo fichero solo está presente una vez en el conjunto.
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Raid0.png/220px-Raid0.png"
-                                            alt="">
-
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>RAID 1: </strong>En este nivel de RAID, se hace una copia de cada
-                                            bloque guardado (Mirroring)
-                                            en los distintos discos que conforman la unidad lógica. Esto resulta útil
-                                            cuando queremos tener más
-                                            seguridad desaprovechando capacidad, ya que, si perdemos un disco, tenemos
-                                            el otro con la misma
-                                            información. </p>
-                                    </td>
-                                    <td>
-                                        <img src="https://www.microgamma.com/tecnologia/i/461px-Raid1.png" alt="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>RAID 3: </strong>Un RAID 3 usa "data striping", consiste en dividir
-                                            los datos a nivel de byte
-                                            en las distintas unidades que forma el RAID, excepto una, en donde se
-                                            almacena información de paridad
-                                            para poder unir estos datos al ser leídos. De esta forma cada byte
-                                            almacenado tiene un bit extra de
-                                            paridad para identificar errores y poder recuperar datos en caso de pérdida
-                                            de una unidad.</p>
-                                    </td>
-                                    <td>
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Raid3.png/220px-Raid3.png"
-                                            alt="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>RAID 5: </strong>También llamado sistema distribuido con paridad, en
-                                            este nivel la información es
-                                            almacenada de forma dividida (striping) en bloques que se reparten entre los
-                                            discos duros que formen el
-                                            RAID. Pero además se genera un bloque de paridad para asegurar la
-                                            redundancia y poder reconstruir la
-                                            información en caso de que un disco duro se corrompa. Este bloque de paridad
-                                            se almacenará en una unidad
-                                            distinta a los bloques de datos que están implicados en el bloque calculado,
-                                            de esta forma la información
-                                            de paridad estará almacenada en un disco distinto a donde están los bloques
-                                            de datos implicados.
-                                    </td>
-                                    </p>
-                                    <td>
-                                        <img src="https://www.microgamma.com/tecnologia/i/460px-Raid5.png" alt="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>RAID 01: </strong>Se le denomina espejo de divisiones. Consiste en un
-                                            nivel principal de tipo
-                                            RAID 1 que hace las funciones de replicar los datos que se encuentran en un
-                                            primer subnivel en un
-                                            segundo. A su vez existirá un subnivel RAID 0 que hará las funciones propias
-                                            de éste, es decir,
-                                            almacenar los datos de forma distribuida entre las unidades que en él se
-                                            encuentran. De esta forma
-                                            tenemos un nivel principal que hace la función de espejo y subniveles que
-                                            hacen la función de división
-                                            de datos. De esta forma si un disco duro falla, los datos estarán bien
-                                            guardados en el otro RAID 0 de
-                                            espejo.
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <img src="https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/1200/public/media/image/2018/02/287303-esquema-raid-01.jpg?itok=7dSFkQwp"
-                                            alt="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>RAID 10: </strong>También llamada división de espejos. Tiene un nivel
-                                            principal de tipo 0 que
-                                            divide los datos almacenados entre los distintos subniveles. A su vez
-                                            tendremos varios subniveles de tipo
-                                            1 que se encargarán de replicar los datos en los discos duros que tengan en
-                                            su interior. En este caso la
-                                            tolerancia a fallos nos va a permitir que pueda fallar todos los discos de
-                                            un subnivel a excepción de
-                                            uno, y será necesario que al menos quede un disco sano en cada uno de los
-                                            subniveles para no perder
-                                            información. Este arreglo de discos, es muy rápida, nada más superada por el
-                                            RAID 0.
-
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <img src="https://www.lifewire.com/thmb/ieRKC6GNeeNT87OHaUDoO7wFCEk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Raid10-56a5d5525f9b58b7d0dea1c9.jpg"
-                                            alt="">
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <br><br><br>
-                <p>A continuacion se presenta un simulador de arreglos de discos RAID</p>
+          <div>
+            <div class="bay-grid" id="bay-grid">
+              <!-- 12 bahías generadas por JS -->
             </div>
-        </section>
+            <div class="chassis-note">
+              <span><b id="nota-count">0</b> / 12 bahías ocupadas</span>
+              <span
+                >Capacidad total instalada:
+                <b id="nota-suma" class="mono">0 GB</b></span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <section>
-            <div class="h-100 p-4 mb-2 bg-white border rounded-3">
-                <div id="area_discos">
-                    <div id="lista_discos">
-                        <div class="fs-3 mb-5">
-                            <i class="bi bi-1-square" style="font-size: 1.2em;"></i>
-                            Seleccione los discos a introducir
-                        </div>
-                        <ul class="mt-4">
-                            <li><button class="hdd" onclick=Generar(500)>500 GB</button></li>
-                            <li><button class="hdd" onclick=Generar(1000)>1TB</button></li>
-                            <li><button class="hdd" onclick=Generar(2000)>2TB</button></li>
-                            <li><button class="hdd" onclick=Generar(3000)>3TB</button></li>
-                            <li><button class="hdd" onclick=Generar(4000)>4TB</button></li>
-                            <li><button class="hdd" onclick=Generar(6000)>6TB</button></li>
-                            <li><button class="hdd" onclick=Generar(8000)>8TB</button></li>
-                            <li><button class="hdd" onclick=Generar(10000)>10TB</button></li>
-                        </ul>
-                    </div>
+      <section class="block wrap" id="compare">
+        <div class="section-head">
+          <span class="tag">02</span>
+          <div>
+            <h2>Compara dos arreglos en paralelo</h2>
+            <p>
+              Usa el mismo set de discos insertado arriba bajo dos niveles RAID
+              distintos y observa cómo se reparte capacidad, seguridad y espacio
+              libre.
+            </p>
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <div class="raid-panel" data-panel="1">
+            <select class="raid-select" id="select1">
+              <option value="0" selected>RAID 0 — Striping</option>
+              <option value="1">RAID 1 — Espejo</option>
+              <option value="3">RAID 3 — Paridad dedicada</option>
+              <option value="5">RAID 5 — Paridad distribuida</option>
+              <option value="01">RAID 01 — Espejo de divisiones</option>
+              <option value="10">RAID 10 — División de espejos</option>
+            </select>
+            <div id="panel1-msg"></div>
+            <div class="stat-grid">
+              <div class="stat">
+                <div class="k">Suma instalada</div>
+                <div class="v" id="suma1">0 <small>GB</small></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="swatch" style="background: var(--teal)"></span
+                  >Capacidad útil
                 </div>
-                <div id="area_nas">
-                    <div id="lista_ranuras">
-                        <ul>
-                            <li class="hdd placeholder"></li>
-                            <li class="hdd placeholder"></li>
-                            <li class="hdd placeholder"></li>
-                            <li class="hdd placeholder"></li>
-                            <li class="hdd placeholder"></li>
-                            <li class="hdd placeholder"></li>
-                        </ul>
-                        <ul id="lista_ranuras_online">
-                            <!-- aqui iran las ranuras activadas -->
-                        </ul>
-                    </div>
+                <div class="v" id="capacidad1">0 <small>GB</small></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="swatch" style="background: var(--accent)"></span
+                  >Seguridad
                 </div>
-                <div id="resultados" class="m-4 pt-4">
-                    <div class="fs-3 mb-1">
-                        <i class="bi bi-2-square" style="font-size: 1.2em;"></i>
-                        Seleccione los diferentes arreglos RAID para comparar
-                    </div>
-
-                    <div class="container align-items-center">
-                        <div class="row">
-                            <div class="col me-2 mt-4 px-0">
-                                <select class="form-select" id="select1" onchange=cambioSelect(id)>
-                                    <option value="0" selected>RAID 0</option>
-                                    <option value="1">RAID 1</option>
-                                    <option value="3">RAID 3</option>
-                                    <option value="5">RAID 5</option>
-                                    <option value="01">RAID 01</option>
-                                    <option value="10">RAID 10</option>
-                                </select>
-                                <table class="table table-hover mt-4 mb-5">
-                                    <tr>
-                                        <td class="table-dark" style="border-radius: 12px 12px 0 0;">Suma:</td>
-                                        <td><input class="form-control" type="text" id="suma" value=0 disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="table-dark">Capacidad:</td>
-                                        <td><input class="form-control" type="text" id="capacidad" disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="table-dark">Seguridad:</td>
-                                        <td><input class="form-control" type="text" id="seguridad" disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="table-dark" style="border-radius: 0 0 12px 12px;border: none;">Sin
-                                            usar:</td>
-                                        <td><input class="form-control" type="text" id="sin_usar" disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                </table>
-
-                                <div id="grafico"></div>
-                                <br><br>
-                                <div id="grafico3"></div>
-                            </div>
-                            <div class="col ms-2 mt-4 px-0">
-                                <select class="form-select" id="select2" onchange=cambioSelect(id)>
-                                    <option value="0">RAID 0</option>
-                                    <option value="1" selected>RAID 1</option>
-                                    <option value="3">RAID 3</option>
-                                    <option value="5">RAID 5</option>
-                                    <option value="01">RAID 01</option>
-                                    <option value="10">RAID 10</option>
-                                </select>
-                                <table class="table table-hover mt-4 mb-5">
-                                    <tr>
-                                        <td class="table-dark" style="border-radius: 12px 12px 0 0;">Suma:</td>
-                                        <td><input class="form-control" type="text" id="suma2" value=0 disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="table-dark">Capacidad:</td>
-                                        <td><input class="form-control" type="text" id="capacidad2" disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="table-dark">Seguridad:</td>
-                                        <td><input class="form-control" type="text" id="seguridad2" disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="table-dark" style="border-radius: 0 0 12px 12px; border: none">Sin
-                                            usar:</td>
-                                        <td><input class="form-control" type="text" id="sin_usar2" disabled></td>
-                                        <td class="pt-sm-3">GB</td>
-                                    </tr>
-                                </table>
-
-                                <div id="grafico2"></div>
-                                <br><br>
-                                <div id="grafico4">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="v" id="seguridad1">0 <small>GB</small></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="swatch" style="background: #3a4360"></span>Sin
+                  usar
                 </div>
-        </section>
-        <br>
+                <div class="v" id="sin_usar1">0 <small>GB</small></div>
+              </div>
+            </div>
+            <div class="chart-box">
+              <div class="label">Distribución</div>
+              <div class="chart-pie-wrap"><canvas id="chartPie1"></canvas></div>
+            </div>
+            <div class="chart-box">
+              <div class="label">Proporción</div>
+              <div class="chart-bar-wrap"><canvas id="chartBar1"></canvas></div>
+            </div>
+          </div>
+
+          <div class="raid-panel" data-panel="2">
+            <select class="raid-select" id="select2">
+              <option value="0">RAID 0 — Striping</option>
+              <option value="1" selected>RAID 1 — Espejo</option>
+              <option value="3">RAID 3 — Paridad dedicada</option>
+              <option value="5">RAID 5 — Paridad distribuida</option>
+              <option value="01">RAID 01 — Espejo de divisiones</option>
+              <option value="10">RAID 10 — División de espejos</option>
+            </select>
+            <div id="panel2-msg"></div>
+            <div class="stat-grid">
+              <div class="stat">
+                <div class="k">Suma instalada</div>
+                <div class="v" id="suma2">0 <small>GB</small></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="swatch" style="background: var(--teal)"></span
+                  >Capacidad útil
+                </div>
+                <div class="v" id="capacidad2">0 <small>GB</small></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="swatch" style="background: var(--accent)"></span
+                  >Seguridad
+                </div>
+                <div class="v" id="seguridad2">0 <small>GB</small></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="swatch" style="background: #3a4360"></span>Sin
+                  usar
+                </div>
+                <div class="v" id="sin_usar2">0 <small>GB</small></div>
+              </div>
+            </div>
+            <div class="chart-box">
+              <div class="label">Distribución</div>
+              <div class="chart-pie-wrap"><canvas id="chartPie2"></canvas></div>
+            </div>
+            <div class="chart-box">
+              <div class="label">Proporción</div>
+              <div class="chart-bar-wrap"><canvas id="chartBar2"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>© 2026 Alexander Hz. Todos los derechos reservados.</span>
+        <span>Simulador de arreglos RAID</span>
+      </div>
+    </footer>
+
+    <!-- ============================= MODAL ============================= -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Niveles RAID</h2>
+          <button class="close" id="modalClose" aria-label="Cerrar">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="raid-card">
+            <svg viewBox="0 0 90 70">
+              <rect x="4" y="6" width="24" height="58" rx="3" fill="#2dd4bf" />
+              <rect
+                x="33"
+                y="6"
+                width="24"
+                height="58"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.6"
+              />
+              <rect
+                x="62"
+                y="6"
+                width="24"
+                height="58"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.3"
+              />
+            </svg>
+            <div>
+              <h3>RAID 0 · Striping</h3>
+              <p>
+                Reparte los datos en bloques entre todos los discos sin paridad
+                ni copia. Da el mejor rendimiento y aprovecha el 100% del
+                espacio, pero si un solo disco falla se pierde todo el arreglo.
+              </p>
+            </div>
+          </div>
+
+          <div class="raid-card">
+            <svg viewBox="0 0 90 70">
+              <rect x="10" y="6" width="30" height="58" rx="3" fill="#ffb100" />
+              <rect
+                x="50"
+                y="6"
+                width="30"
+                height="58"
+                rx="3"
+                fill="#ffb100"
+                opacity="0.5"
+              />
+            </svg>
+            <div>
+              <h3>RAID 1 · Espejo</h3>
+              <p>
+                Duplica cada bloque en todos los discos del arreglo (mirroring).
+                Solo se aprovecha la capacidad de un disco, pero los datos
+                sobreviven mientras quede al menos una unidad sana.
+              </p>
+            </div>
+          </div>
+
+          <div class="raid-card">
+            <svg viewBox="0 0 90 70">
+              <rect x="4" y="6" width="20" height="58" rx="3" fill="#2dd4bf" />
+              <rect
+                x="28"
+                y="6"
+                width="20"
+                height="58"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.6"
+              />
+              <rect
+                x="52"
+                y="6"
+                width="20"
+                height="58"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.3"
+              />
+              <rect x="76" y="6" width="10" height="58" rx="3" fill="#ffb100" />
+            </svg>
+            <div>
+              <h3>RAID 3 · Paridad dedicada (nivel de byte)</h3>
+              <p>
+                Divide los datos a nivel de byte entre los discos y reserva una
+                unidad completa solo para paridad, que permite reconstruir la
+                información si otro disco falla. Necesita 3 discos o más.
+              </p>
+            </div>
+          </div>
+
+          <div class="raid-card">
+            <svg viewBox="0 0 90 70">
+              <rect x="4" y="6" width="20" height="58" rx="3" fill="#2dd4bf" />
+              <rect x="28" y="6" width="20" height="18" rx="3" fill="#ffb100" />
+              <rect
+                x="28"
+                y="28"
+                width="20"
+                height="36"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.6"
+              />
+              <rect
+                x="52"
+                y="6"
+                width="20"
+                height="58"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.3"
+              />
+              <rect
+                x="76"
+                y="46"
+                width="10"
+                height="18"
+                rx="3"
+                fill="#ffb100"
+              />
+            </svg>
+            <div>
+              <h3>RAID 5 · Paridad distribuida</h3>
+              <p>
+                Igual que el 3, pero el bloque de paridad rota entre todos los
+                discos en vez de vivir en una sola unidad. Tolera la pérdida de
+                un disco. Necesita 3 discos o más.
+              </p>
+            </div>
+          </div>
+
+          <div class="raid-card">
+            <svg viewBox="0 0 90 70">
+              <rect x="4" y="6" width="18" height="26" rx="3" fill="#2dd4bf" />
+              <rect
+                x="24"
+                y="6"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.6"
+              />
+              <rect
+                x="4"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.6"
+              />
+              <rect
+                x="24"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.3"
+              />
+              <rect x="48" y="6" width="18" height="26" rx="3" fill="#ffb100" />
+              <rect
+                x="68"
+                y="6"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#ffb100"
+                opacity="0.6"
+              />
+              <rect
+                x="48"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#ffb100"
+                opacity="0.6"
+              />
+              <rect
+                x="68"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#ffb100"
+                opacity="0.3"
+              />
+            </svg>
+            <div>
+              <h3>RAID 01 · Espejo de divisiones</h3>
+              <p>
+                Un espejo (RAID 1) de dos grupos, y dentro de cada grupo los
+                datos se dividen en striping (RAID 0). Si un disco falla, todo
+                su grupo queda expuesto hasta reconstruirlo. Necesita 4 discos o
+                más, en número par.
+              </p>
+            </div>
+          </div>
+
+          <div class="raid-card">
+            <svg viewBox="0 0 90 70">
+              <rect x="4" y="6" width="18" height="26" rx="3" fill="#ffb100" />
+              <rect
+                x="24"
+                y="6"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#ffb100"
+                opacity="0.5"
+              />
+              <rect x="48" y="6" width="18" height="26" rx="3" fill="#2dd4bf" />
+              <rect
+                x="68"
+                y="6"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.5"
+              />
+              <rect
+                x="4"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#ffb100"
+                opacity="0.5"
+              />
+              <rect
+                x="24"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#ffb100"
+              />
+              <rect
+                x="48"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#2dd4bf"
+                opacity="0.5"
+              />
+              <rect
+                x="68"
+                y="38"
+                width="18"
+                height="26"
+                rx="3"
+                fill="#2dd4bf"
+              />
+            </svg>
+            <div>
+              <h3>RAID 10 · División de espejos</h3>
+              <p>
+                Los datos se dividen (RAID 0) entre varios pares, y cada par es
+                un espejo (RAID 1) interno. Tolera fallos siempre que sobreviva
+                al menos un disco de cada pareja. Necesita 4 discos o más, en
+                número par.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- JS propio -->
     <script src="assets/js/app.js"></script>
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
-        crossorigin="anonymous"></script>
-</body>
-
+  </body>
 </html>

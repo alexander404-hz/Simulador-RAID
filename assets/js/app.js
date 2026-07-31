@@ -1,481 +1,280 @@
-let fila = -1;
-let sumaInput = document.getElementById("suma");
-let capacidadInput = document.getElementById("capacidad");
-let seguridadInput = document.getElementById("seguridad");
-let sinUsarInput = document.getElementById("sin_usar");
-let graficoDiv = document.getElementById("grafico");
-let graficoDiv2 = document.getElementById("grafico2");
-let graficoDiv3 = document.getElementById("grafico3");
-let graficoDiv4 = document.getElementById("grafico4");
-let sumaInput2 = document.getElementById("suma2");
-let capacidadInput2 = document.getElementById("capacidad2");
-let seguridadInput2 = document.getElementById("seguridad2");
-let sinUsarInput2 = document.getElementById("sin_usar2");
-let capacidadRaid = 0,
-  sumaRaid = 0,
-  seguridadRaid = 0,
-  sinUsarRaid = 0,
-  mensaje = "",
-  myChart1 = null,
-  myChart2 = null,
-  myChart3 = null,
-  myChart4 = null;
-let capacidadRaid2 = 0,
-  seguridadRaid2 = 0,
-  sinUsarRaid2 = 0;
-let select = document.getElementById("select1");
-let select2 = document.getElementById("select2");
+/* ============================================================
+   ESTADO
+   ============================================================ */
+const MAX_BAHIAS = 12;
+const TAMANOS = [500, 1000, 2000, 3000, 4000, 6000, 8000, 10000];
+let discos = []; // { id, capacidad }
+let nextId = 0;
 
-function Generar(capacidadDisco) {
-  if (fila < 5) {
-    fila++;
-    if (capacidadDisco == 500)
-      var disco =
-        "<li id=" +
-        fila +
-        " accesskey=" +
-        capacidadDisco +
-        " class='disco hdd online'><span>" +
-        capacidadDisco +
-        "GB</span><button onclick=quitar(" +
-        fila +
-        ")>X</button></li>";
-    else
-      var disco =
-        "<li id=" +
-        fila +
-        " accesskey=" +
-        capacidadDisco +
-        " class='disco hdd online'><span>" +
-        capacidadDisco / 1000 +
-        "TB</span><button onclick=quitar(" +
-        fila +
-        ")>X</button></li>";
+const paneles = {
+  1: {
+    select: document.getElementById("select1"),
+    tipo: "0",
+    pie: null,
+    bar: null,
+  },
+  2: {
+    select: document.getElementById("select2"),
+    tipo: "1",
+    pie: null,
+    bar: null,
+  },
+};
 
-    let celdas = document.getElementById("lista_ranuras_online");
+const COLOR_CAPACIDAD = "#2dd4bf";
+const COLOR_SEGURIDAD = "#ffb100";
+const COLOR_SINUSAR = "#3a4360";
 
-    celdas.innerHTML += disco;
-    calcularCapacidad(
-      1,
-      select,
-      capacidadRaid,
-      seguridadRaid,
-      sinUsarRaid,
-      sumaInput,
-      capacidadInput,
-      seguridadInput,
-      sinUsarInput,
-    );
-    calcularCapacidad(
-      2,
-      select2,
-      capacidadRaid2,
-      seguridadRaid2,
-      sinUsarRaid2,
-      sumaInput2,
-      capacidadInput2,
-      seguridadInput2,
-      sinUsarInput2,
-    );
-  }
+/* ============================================================
+   PALETA DE DISCOS
+   ============================================================ */
+function formatoCapacidad(gb) {
+  return gb === 500 ? "500 GB" : gb / 1000 + " TB";
 }
 
-function quitar(posicion) {
-  //Se obtiene un array de elementos que tengan por clase "disco hdd online"
-  var discosOnLine = document.getElementsByClassName("disco hdd online");
+function pintarPaleta() {
+  const cont = document.getElementById("paleta-discos");
+  cont.innerHTML = TAMANOS.map(
+    (gb) => `
+    <button class="disk-card" ${discos.length >= MAX_BAHIAS ? "disabled" : ""} onclick="agregarDisco(${gb})" aria-label="Insertar disco de ${formatoCapacidad(gb)}">
+      <img src="img/disco.png" alt="">
+      <span>${formatoCapacidad(gb)}</span>
+      <small>insertar</small>
+    </button>
+  `,
+  ).join("");
+}
 
-  //Se almacena el elemento "disco hdd on line" que sera borrado despues
-  let discoABorrar = discosOnLine[posicion];
-
-  //Se elimina el elemento
-  discoABorrar.remove();
-
-  //Al eliminar un disco se debe actualizar los id, tomando el "tamnaño" para realizar esto
-  for (let i = 0; i < discosOnLine.length; i++) {
-    //se actualiza al id que debe ser en realidad
-    discosOnLine[i].id = i;
-
-    //se obtiene el elemento boton que elimina un disco
-    var BotonQuitar = discosOnLine[i].getElementsByTagName("button")[0];
-
-    //Se actualiza el id del boton que debe ser en realidad
-    BotonQuitar.setAttribute("onclick", "quitar(" + i + ")");
+/* ============================================================
+   CHASIS: RIEL DE LEDS + BAHÍAS
+   ============================================================ */
+function pintarChasis() {
+  const rail = document.getElementById("rail-disks");
+  rail.innerHTML = "";
+  for (let i = 0; i < MAX_BAHIAS; i++) {
+    const activo = i < discos.length;
+    rail.innerHTML += `<div class="rail-row ${activo ? "active" : ""}"><span class="dot"></span>DISK ${i + 1}</div>`;
   }
 
-  fila--;
-  let select = document.getElementById("select1");
-  calcularCapacidad(
-    1,
-    select,
-    capacidadRaid,
-    seguridadRaid,
-    sinUsarRaid,
-    sumaInput,
-    capacidadInput,
-    seguridadInput,
-    sinUsarInput,
-  );
-  calcularCapacidad(
-    2,
-    select2,
-    capacidadRaid2,
-    seguridadRaid2,
-    sinUsarRaid2,
-    sumaInput2,
-    capacidadInput2,
-    seguridadInput2,
-    sinUsarInput2,
-  );
-}
-
-function cambioSelect(id) {
-  let select = document.getElementById("" + id + "");
-  if (id == "select1")
-    calcularCapacidad(
-      1,
-      select,
-      capacidadRaid,
-      seguridadRaid,
-      sinUsarRaid,
-      sumaInput,
-      capacidadInput,
-      seguridadInput,
-      sinUsarInput,
-    );
-  else
-    calcularCapacidad(
-      2,
-      select2,
-      capacidadRaid2,
-      seguridadRaid2,
-      sinUsarRaid2,
-      sumaInput2,
-      capacidadInput2,
-      seguridadInput2,
-      sinUsarInput2,
-    );
-}
-
-function calcularCapacidad(
-  k,
-  select,
-  capacidadRaid,
-  seguridadRaid,
-  sinUsarRaid,
-  sumaInput,
-  capacidadInput,
-  seguridadInput,
-  sinUsarInput,
-) {
-  let discos = document.getElementsByClassName("disco hdd online");
-  if (EsValido(select)) {
-    calcularSuma();
-    switch (select.value) {
-      case "0":
-        capacidadRaid = sumaRaid;
-        seguridadRaid = 0;
-        sinUsarRaid = sumaRaid - capacidadRaid - seguridadRaid;
-        break;
-      case "1":
-        capacidadRaid = calcularMenor();
-        seguridadRaid = capacidadRaid * discos.length - capacidadRaid;
-        sinUsarRaid = sumaRaid - capacidadRaid - seguridadRaid;
-        break;
-      case "3":
-        capacidadRaid = calcularMenor() * (discos.length - 1);
-        seguridadRaid = calcularMenor();
-        sinUsarRaid = sumaRaid - capacidadRaid - seguridadRaid;
-        break;
-      case "5":
-        capacidadRaid = calcularMenor() * (discos.length - 1);
-        seguridadRaid = calcularMenor();
-        sinUsarRaid = sumaRaid - capacidadRaid - seguridadRaid;
-        break;
-      case "10":
-        capacidadRaid = calcularMenor() * (discos.length / 2);
-        seguridadRaid = capacidadRaid;
-        sinUsarRaid = sumaRaid - capacidadRaid - seguridadRaid;
-        break;
-      case "01":
-        capacidadRaid = calcularMenor() * 2;
-        seguridadRaid = calcularMenor() * (discos.length - 2);
-        sinUsarRaid = sumaRaid - capacidadRaid - seguridadRaid;
-        break;
-    }
-    if (k == 1) {
-      if (myChart1) {
-        addDataPastel(myChart1, capacidadRaid, seguridadRaid, sinUsarRaid);
-        addDataPastel(myChart3, capacidadRaid, seguridadRaid, sinUsarRaid);
-      } else {
-        crearChartPastel(1, capacidadRaid, seguridadRaid, sinUsarRaid);
-        crearChartBarras(3, capacidadRaid, seguridadRaid, sinUsarRaid);
-      }
+  const grid = document.getElementById("bay-grid");
+  grid.innerHTML = "";
+  for (let i = 0; i < MAX_BAHIAS; i++) {
+    const disco = discos[i];
+    if (disco) {
+      grid.innerHTML += `
+        <div class="bay filled">
+          <span class="bay-num">${i + 1}</span>
+          <span class="bay-capacity mono">${formatoCapacidad(disco.capacidad)}</span>
+          <button class="bay-remove" onclick="quitarDisco(${disco.id})" aria-label="Quitar disco ${i + 1}">×</button>
+        </div>`;
     } else {
-      if (myChart2 && k == 2) {
-        addDataPastel(myChart2, capacidadRaid, seguridadRaid, sinUsarRaid);
-        addDataPastel(myChart4, capacidadRaid, seguridadRaid, sinUsarRaid);
-      } else {
-        crearChartPastel(2, capacidadRaid, seguridadRaid, sinUsarRaid);
-        crearChartBarras(4, capacidadRaid, seguridadRaid, sinUsarRaid);
-      }
+      grid.innerHTML += `<div class="bay"><span class="bay-num">${i + 1}</span></div>`;
     }
-  } else {
-    //Aviso(mensaje)
-    if (k == 1) {
-      graficoDiv.innerHTML = "<p id='parrafo'>" + mensaje + "</p>";
-      graficoDiv3.innerHTML = "<span id='parrafo'></span>";
-    } else {
-      graficoDiv2.innerHTML = "<p id='parrafo'>" + mensaje + "</p>";
-      graficoDiv4.innerHTML = "<span id='parrafo'></span>";
-    }
-    sumaRaid = 0;
-    capacidadRaid = 0;
-    seguridadRaid = 0;
-    sinUsarRaid = 0;
   }
-  sumaInput.value = sumaRaid;
-  capacidadInput.value = capacidadRaid;
-  seguridadInput.value = seguridadRaid;
-  sinUsarInput.value = sinUsarRaid;
+
+  document.getElementById("nota-count").textContent = discos.length;
+  document.getElementById("nota-suma").textContent =
+    discos.reduce((a, d) => a + d.capacidad, 0) + " GB";
 }
 
-function calcularMenor() {
-  let menor = 100000;
-  let discos = document.getElementsByClassName("disco hdd online");
-  for (let j = 0; j < discos.length; j++) {
-    capacidadActual = parseInt(discos[j].getAttribute("accesskey"));
-    if (capacidadActual < menor) menor = capacidadActual;
+function agregarDisco(capacidad) {
+  if (discos.length >= MAX_BAHIAS) return;
+  discos.push({ id: nextId++, capacidad });
+  refrescarTodo();
+}
+
+function quitarDisco(id) {
+  discos = discos.filter((d) => d.id !== id);
+  refrescarTodo();
+}
+
+function refrescarTodo() {
+  pintarPaleta();
+  pintarChasis();
+  actualizarPanel(1);
+  actualizarPanel(2);
+}
+
+/* ============================================================
+   LÓGICA RAID (pura, sin efectos secundarios)
+   ============================================================ */
+function calcularRaid(tipo) {
+  const n = discos.length;
+  const suma = discos.reduce((a, d) => a + d.capacidad, 0);
+  const menor = n ? Math.min(...discos.map((d) => d.capacidad)) : 0;
+
+  const val = validarRaid(tipo);
+  if (!val.valido)
+    return {
+      valido: false,
+      mensaje: val.mensaje,
+      suma,
+      capacidad: 0,
+      seguridad: 0,
+      sinUsar: 0,
+    };
+
+  let capacidad = 0,
+    seguridad = 0;
+  switch (tipo) {
+    case "0":
+      capacidad = suma;
+      seguridad = 0;
+      break;
+    case "1":
+      capacidad = menor;
+      seguridad = menor * n - menor;
+      break;
+    case "3":
+    case "5":
+      capacidad = menor * (n - 1);
+      seguridad = menor;
+      break;
+    case "10":
+      capacidad = menor * (n / 2);
+      seguridad = capacidad;
+      break;
+    case "01":
+      capacidad = menor * 2;
+      seguridad = menor * (n - 2);
+      break;
   }
-  return menor;
+  const sinUsar = suma - capacidad - seguridad;
+  return { valido: true, mensaje: "", suma, capacidad, seguridad, sinUsar };
 }
-function calcularSuma() {
-  let discos = document.getElementsByClassName("disco hdd online");
-  sumaRaid = 0;
-  for (let j = 0; j < discos.length; j++) {
-    sumaRaid += parseInt(discos[j].getAttribute("accesskey"), 10);
+
+function validarRaid(tipo) {
+  const n = discos.length;
+  if (n < 2)
+    return {
+      valido: false,
+      mensaje: "Inserta al menos 2 discos para poder simular un arreglo.",
+    };
+  if ((tipo === "3" || tipo === "5") && n < 3)
+    return { valido: false, mensaje: "Este RAID necesita 3 discos o más." };
+  if ((tipo === "10" || tipo === "01") && (n % 2 === 1 || n < 4))
+    return {
+      valido: false,
+      mensaje:
+        "La cantidad de discos para este RAID debe ser par y mayor o igual a 4.",
+    };
+  return { valido: true, mensaje: "" };
+}
+
+/* ============================================================
+   RENDER DE PANELES + GRÁFICOS
+   ============================================================ */
+function actualizarPanel(idx) {
+  const panel = paneles[idx];
+  panel.tipo = panel.select.value;
+  const r = calcularRaid(panel.tipo);
+
+  document.getElementById("suma" + idx).innerHTML =
+    r.suma + " <small>GB</small>";
+  document.getElementById("capacidad" + idx).innerHTML =
+    (r.valido ? r.capacidad : 0) + " <small>GB</small>";
+  document.getElementById("seguridad" + idx).innerHTML =
+    (r.valido ? r.seguridad : 0) + " <small>GB</small>";
+  document.getElementById("sin_usar" + idx).innerHTML =
+    (r.valido ? r.sinUsar : 0) + " <small>GB</small>";
+
+  const msgBox = document.getElementById("panel" + idx + "-msg");
+  msgBox.innerHTML = r.valido
+    ? ""
+    : `<div class="panel-msg">${r.mensaje}</div>`;
+
+  const capacidad = r.valido ? r.capacidad : 0;
+  const seguridad = r.valido ? r.seguridad : 0;
+  const sinUsar = r.valido ? r.sinUsar : 0;
+
+  if (!panel.pie) {
+    panel.pie = crearPie(idx);
+    panel.bar = crearBar(idx);
   }
-  sumaInput.value = sumaRaid;
+  panel.pie.data.datasets[0].data = [capacidad, seguridad, sinUsar];
+  panel.pie.update();
+  panel.bar.data.datasets[0].data = [capacidad];
+  panel.bar.data.datasets[1].data = [seguridad];
+  panel.bar.data.datasets[2].data = [sinUsar];
+  panel.bar.update();
 }
 
-//actualiza barras
-function addDataBarra(myChart, capacidadRaid, seguridadRaid, sinUsarRaid) {
-  myChart.data.datasets[0].data = [capacidadRaid];
-  myChart.data.datasets[1].data = [seguridadRaid];
-  myChart.data.datasets[2].data = [sinUsarRaid];
-  myChart.update();
+function chartDefaults() {
+  Chart.defaults.color = "#8b93ad";
+  Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+  Chart.defaults.borderColor = "#232f47";
 }
+chartDefaults();
 
-//actualiza pastel
-function addDataPastel(myChart, capacidadRaid, seguridadRaid, sinUsarRaid) {
-  myChart.data.datasets[0].data = [capacidadRaid, seguridadRaid, sinUsarRaid];
-  myChart.update();
-}
-
-function crearChartBarras(k, capacidadRaid, seguridadRaid, sinUsarRaid) {
-  if (k == 3)
-    graficoDiv3.innerHTML =
-      "<div style='width: 95%; height: 40vh;'><canvas id='myChart" +
-      k +
-      "'></canvas></div>";
-  else
-    graficoDiv4.innerHTML =
-      "<div style='width: 95%; height: 40vh;'><canvas id='myChart" +
-      k +
-      "'></canvas></div>";
-
-  const labels = [""];
-
-  const data = {
-    labels: labels,
-    datasets: [
-      {
-        label: "Capacidad (GB)",
-        data: [capacidadRaid],
-        backgroundColor: "green",
-        borderColor: "rgb(255, 99, 132)",
-      },
-      {
-        label: "Copia de seguridad (GB)",
-        data: [seguridadRaid],
-        backgroundColor: "yellow",
-        borderColor: "rgb(255, 99, 132)",
-      },
-      {
-        label: "Sin usar (GB)",
-        data: [sinUsarRaid],
-        backgroundColor: "gray",
-        borderColor: "rgb(255, 99, 132)",
-      },
-    ],
-  };
-
-  const config = {
-    type: "bar",
-    data: data,
+function crearPie(idx) {
+  const ctx = document.getElementById("chartPie" + idx);
+  return new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Capacidad", "Seguridad", "Sin usar"],
+      datasets: [
+        {
+          data: [0, 0, 0],
+          backgroundColor: [COLOR_CAPACIDAD, COLOR_SEGURIDAD, COLOR_SINUSAR],
+          borderColor: "#111827",
+          borderWidth: 2,
+        },
+      ],
+    },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "62%",
       plugins: {
-        title: {
-          display: true,
-        },
         legend: {
-          display: true,
-          labels: {
-            color: "black",
-          },
-        },
-      },
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: "y",
-      scales: {
-        x: {
-          stacked: true,
-        },
-        y: {
-          stacked: true,
+          position: "bottom",
+          labels: { boxWidth: 10, boxHeight: 10, padding: 14 },
         },
       },
     },
-  };
-
-  const myChart = new Chart(
-    document.getElementById("myChart" + k + ""),
-    config,
-  );
-}
-function crearChartPastel(k, capacidadRaid, seguridadRaid, sinUsarRaid) {
-  if (k == 1)
-    graficoDiv.innerHTML =
-      "<div style='width: 95%; height: 75vh;'><canvas id='myChart" +
-      k +
-      "'></canvas></div>";
-  else
-    graficoDiv2.innerHTML =
-      "<div style='width: 95%; height: 75vh;'><canvas id='myChart" +
-      k +
-      "'></canvas></div>";
-
-  const data = {
-    labels: ["Capacidad", "Seguridad", "Sin usar"],
-    datasets: [
-      {
-        label: "Tamaño (GB)",
-        data: [capacidadRaid, seguridadRaid, sinUsarRaid],
-        backgroundColor: ["green", "yellow", "gray"],
-        hoverOffset: 4,
-      },
-    ],
-  };
-
-  const config = {
-    type: "pie",
-    data: data,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    },
-  };
-
-  const myChart = new Chart(
-    document.getElementById("myChart" + k + ""),
-    config,
-  );
-}
-function EsValido(select) {
-  let esvalido = true;
-  let discos = document.getElementsByClassName("disco hdd online");
-  if (discos.length > 1) {
-    switch (select.value) {
-      case "3":
-        if (discos.length < 3) {
-          esvalido = false;
-          mensaje = "Este raid necesita 3 discos o más";
-        }
-
-        break;
-      case "5":
-        if (discos.length < 3) {
-          esvalido = false;
-          mensaje = "Este raid necesita 3 discos o más";
-        }
-        break;
-      case "10":
-        if (discos.length % 2 == 1 || discos.length < 4) {
-          esvalido = false;
-          mensaje =
-            "la cantidad de discos para este raid debe ser par y mayor o igual 4";
-        }
-        break;
-      case "01":
-        if (discos.length % 2 == 1 || discos.length < 4) {
-          esvalido = false;
-          mensaje =
-            "la cantidad de discos para este raid debe ser par y mayor o igual 4";
-        }
-        break;
-    }
-  } else {
-    esvalido = false;
-    mensaje = "Por favor ingrese más discos";
-  }
-
-  return esvalido;
-}
-
-function Aviso(mensaje) {
-  Swal.fire({
-    title: "Aviso",
-    text: mensaje,
-    icon: "error",
   });
 }
 
-var modal = document.getElementById("myModal");
+function crearBar(idx) {
+  const ctx = document.getElementById("chartBar" + idx);
+  return new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: [""],
+      datasets: [
+        { label: "Capacidad", data: [0], backgroundColor: COLOR_CAPACIDAD },
+        { label: "Seguridad", data: [0], backgroundColor: COLOR_SEGURIDAD },
+        { label: "Sin usar", data: [0], backgroundColor: COLOR_SINUSAR },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, grid: { color: "#1c2438" } },
+        y: { stacked: true, grid: { display: false } },
+      },
+    },
+  });
+}
 
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+paneles[1].select.addEventListener("change", () => actualizarPanel(1));
+paneles[2].select.addEventListener("change", () => actualizarPanel(2));
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+const modal = document.getElementById("myModal");
+document.getElementById("myBtn").onclick = () => modal.classList.add("open");
+document.getElementById("modalClose").onclick = () =>
+  modal.classList.remove("open");
+window.addEventListener("click", (e) => {
+  if (e.target === modal) modal.classList.remove("open");
+});
 
-// When the user clicks on the button, open the modal
-btn.onclick = function () {
-  modal.style.display = "block";
-};
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function () {
-  modal.style.display = "none";
-};
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function (event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-};
-
-var modal = document.getElementById("myModal");
-
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks on the button, open the modal
-btn.onclick = function () {
-  modal.style.display = "block";
-};
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function () {
-  modal.style.display = "none";
-};
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function (event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-};
+/* ============================================================
+   INICIO
+   ============================================================ */
+refrescarTodo();
