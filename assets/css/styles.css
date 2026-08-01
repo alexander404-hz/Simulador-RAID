@@ -239,9 +239,9 @@ section.block {
 
 /* ============================= DISK PALETTE ============================= */
 .disk-palette {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
-  gap: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
   margin-bottom: 46px;
 }
 .disk-card {
@@ -290,13 +290,15 @@ section.block {
 
 /* ============================= CHASSIS ============================= */
 .chassis {
-  flex: 1.25;
   display: grid;
-  grid-template-columns: 14.7% 1fr;
-  gap: 1rem;
+  grid-template-columns: 17.6% 1fr;
+  align-items: flex-start;
+  gap: 0.9rem;
 
   height: 100%;
-  aspect-ratio: 1270 / 1069;
+  margin: 0 auto;
+  max-width: 900px;
+  aspect-ratio: 1471 / 526;
   background-image: url("../img/nas-desktop.webp");
   background-repeat: no-repeat;
   background-size: cover;
@@ -305,29 +307,59 @@ section.block {
   border-radius: 20px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .chassis {
-    grid-template-columns: 1fr;
+    grid-template-columns: 21.2% 1fr;
+    gap: 0.45rem;
+    max-width: 450px;
+    background-image: url("../img/nas-tablet.webp");
+    aspect-ratio: 1243 / 763;
   }
 }
 
 .chassis-rail {
-  margin: 5rem 0.25rem 8rem 0.25rem;
-  padding: 16px 14px;
-  background: #252525;
+  margin: 4.25rem 0.6rem 0.75rem;
+  padding: 0.4rem 0.75rem;
+  background: #2c2c2c;
 
-  border: 1px solid var(--border-soft);
+  border: 1px solid #393939;
   border-radius: 14px;
 }
+
+@media (max-width: 900px) {
+  .chassis-rail {
+    margin: 3.8rem 0.5rem 0rem 0.6rem;
+    padding: 0.3rem 0.65rem;
+  }
+}
+
 .rail-row {
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--text-dim);
   padding: 3px 0;
 }
+
+@media (max-width: 900px) {
+  .rail-row {
+    font-size: 0.43rem;
+  }
+}
+
+.rail-row--two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .rail-row--two {
+    grid-template-columns: 1fr;
+  }
+}
+
 .rail-row .dot {
   width: 7px;
   height: 7px;
@@ -345,30 +377,53 @@ section.block {
 }
 .rail-divider {
   height: 1px;
-  background: var(--border-soft);
-  margin: 10px 0;
+  background: #393939;
+  margin: 3px 0;
 }
 
 .chassis-disks {
-  margin-block: 2rem;
-  padding: 1rem;
+  padding: 0.2rem 1.8rem 0rem 0.6rem;
 }
+
+@media (max-width: 900px) {
+  .chassis-disks {
+    padding: 0.6rem 1.2rem 0rem 0.3rem;
+  }
+}
+
+.chassis-note {
+  margin-bottom: 0.43rem;
+  font-size: 0.8rem;
+  text-align: end;
+  color: var(--text-dim);
+}
+
+@media (max-width: 900px) {
+  .chassis-note {
+    margin-bottom: 1.25rem;
+  }
+}
+
+.chassis-note b {
+  color: var(--text-muted);
+}
+
 .bay-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+  gap: 6px;
   align-content: start;
 }
-@media (max-width: 620px) {
+
+@media (max-width: 900px) {
   .bay-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 7px 20px;
   }
 }
 
 .bay {
-  aspect-ratio: 455/139;
-  border-radius: 10px;
-  border: 1px dashed var(--border);
+  aspect-ratio: 139/549;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -378,21 +433,34 @@ section.block {
   position: relative;
   background: rgba(255, 255, 255, 0.015);
 }
+
+@media (max-width: 900px) {
+  .bay {
+    aspect-ratio: 519/190;
+  }
+}
+
 .bay.filled {
-  border: 1px solid var(--border);
-  border-style: solid;
-  background-image: url("../img/disc-inserted.webp");
+  background-image: url("../img/disc-inserted-vertical.webp");
   background-size: cover;
-  background-position: center;
+  background-position: 90% center;
   color: #fff;
 }
+
+@media (max-width: 900px) {
+  .bay.filled {
+    background-image: url("../img/disc-inserted.webp");
+    background-position: start;
+  }
+}
+
 .bay.filled::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  box-shadow: inset 0 0 0 1px rgba(70, 224, 138, 0.5);
 }
+
 .bay-num {
   position: absolute;
   top: 6px;
@@ -400,6 +468,14 @@ section.block {
   font-size: 0.62rem;
   color: var(--text-dim);
 }
+
+@media (max-width: 900px) {
+  .bay-num {
+    top: 10px;
+    left: 8px;
+  }
+}
+
 .bay.filled .bay-num {
   color: rgba(255, 255, 255, 0.7);
 }
@@ -431,19 +507,6 @@ section.block {
 .bay-remove:hover {
   background: var(--danger);
   border-color: var(--danger);
-}
-
-.chassis-note {
-  margin-top: 16px;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.chassis-note b {
-  color: var(--text-muted);
 }
 
 /* ============================= COMPARE ============================= */

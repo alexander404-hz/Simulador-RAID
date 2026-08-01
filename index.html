@@ -94,24 +94,25 @@
         <div class="chassis">
           <div class="chassis-rail">
             <div class="rail-row on"><span class="dot"></span>STATUS</div>
-            <div class="rail-row on"><span class="dot"></span>LAN 1</div>
-            <div class="rail-row on"><span class="dot"></span>LAN 2</div>
+            <div class="rail-row--two">
+              <div class="rail-row on"><span class="dot"></span>LAN 1</div>
+              <div class="rail-row on"><span class="dot"></span>LAN 2</div>
+            </div>
             <div class="rail-divider"></div>
-            <div id="rail-disks">
+            <div id="rail-disks" class="rail-row--two">
               <!-- 12 filas DISK n generadas por JS -->
             </div>
           </div>
 
           <div class="chassis-disks">
-            <div class="bay-grid" id="bay-grid">
-              <!-- 12 bahías generadas por JS -->
-            </div>
             <div class="chassis-note">
-              <span><b id="nota-count">0</b> / 12 bahías ocupadas</span>
               <span
                 >Capacidad total instalada:
                 <b id="nota-suma" class="mono">0 GB</b></span
               >
+            </div>
+            <div class="bay-grid" id="bay-grid">
+              <!-- 12 bahías generadas por JS -->
             </div>
           </div>
         </div>

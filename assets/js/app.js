@@ -1,7 +1,7 @@
 /* ============================================================
    ESTADO
    ============================================================ */
-const MAX_BAHIAS = 12;
+const MAX_BAHIAS = 6;
 const TAMANOS = [500, 1000, 2000, 3000, 4000, 6000, 8000, 10000];
 let discos = []; // { id, capacidad }
 let nextId = 0;
@@ -72,7 +72,6 @@ function pintarChasis() {
     }
   }
 
-  document.getElementById("nota-count").textContent = discos.length;
   document.getElementById("nota-suma").textContent =
     discos.reduce((a, d) => a + d.capacidad, 0) + " GB";
 }
