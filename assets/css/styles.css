@@ -351,11 +351,10 @@ section.block {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 9px 8px 8px;
+  padding: 10px 8px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
   cursor: pointer;
   transition:
     transform 0.15s ease,
@@ -370,11 +369,14 @@ section.block {
     margin-bottom: 34px;
   }
   .disk-card {
-    padding: 7px 6px 6px;
+    padding: 8px 6px;
     flex-basis: 72px;
   }
   .disk-card-visual img {
-    width: 40px;
+    width: 46px;
+  }
+  .disk-card-cap {
+    top: -2px;
   }
 }
 @media (max-width: 480px) {
@@ -384,15 +386,15 @@ section.block {
   }
   .disk-card {
     flex-basis: 64px;
-    padding: 6px 4px 6px;
-    gap: 2px;
+    padding: 6px 4px;
   }
   .disk-card-visual img {
-    width: 33px;
+    width: 38px;
   }
   .disk-card-cap {
-    font-size: 0.68rem;
-    padding: 2px 7px;
+    font-size: 0.64rem;
+    padding: 2px 6px;
+    top: -3px;
   }
 }
 .disk-card:hover {
@@ -412,15 +414,17 @@ section.block {
   color: var(--text);
 }
 .disk-card-cap {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.78rem;
-  color: var(--text);
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 3px 10px;
-  letter-spacing: 0.01em;
+  font-size: 0.75rem;
+  color: #2c2c2c;
+  padding: 2px 9px;
+  white-space: nowrap;
+  z-index: 1;
 }
 .disk-card-visual {
   position: relative;
@@ -430,7 +434,7 @@ section.block {
   width: 100%;
 }
 .disk-card-visual img {
-  width: 46px;
+  width: 54px;
   height: auto;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
   transition: transform 0.15s ease;
@@ -449,6 +453,7 @@ section.block {
   border-radius: 8px;
   opacity: 0;
   transition: opacity 0.15s ease;
+  z-index: 2;
 }
 .disk-card:hover .disk-card-add,
 .disk-card:focus-visible .disk-card-add {
@@ -708,7 +713,7 @@ section.block {
   height: 22px;
   padding: 0;
   border-radius: 4px;
-  background: linear-gradient(180deg, #393939, #171d30);
+  background: linear-gradient(180deg, #2c2c2c, #393939e0);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),

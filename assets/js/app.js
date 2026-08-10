@@ -35,7 +35,7 @@ const COLOR_SINUSAR = "#3a4360";
    PALETA DE DISCOS
    ============================================================ */
 function formatoCapacidad(gb) {
-  return gb === 500 ? "500 GB" : gb / 1000 + " TB";
+  return gb === 500 ? "500GB" : gb / 1000 + "TB";
 }
 
 function pintarPaleta() {
@@ -43,8 +43,8 @@ function pintarPaleta() {
   cont.innerHTML = TAMANOS.map(
     (gb) => `
     <button class="disk-card" ${discos.length >= MAX_BAHIAS ? "disabled" : ""} onclick="agregarDisco(${gb})" aria-label="Insertar disco de ${formatoCapacidad(gb)}">
-      <span class="disk-card-cap mono">${formatoCapacidad(gb)}</span>
       <span class="disk-card-visual">
+        <span class="disk-card-cap mono">${formatoCapacidad(gb)}</span>
         <img src="assets/img/disco.webp" alt="">
         <span class="disk-card-add" aria-hidden="true">+</span>
       </span>
