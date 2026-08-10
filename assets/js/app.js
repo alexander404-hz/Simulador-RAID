@@ -28,7 +28,9 @@ const paneles = {
 };
 
 function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
 }
 
 const COLOR_CAPACIDAD = cssVar("--teal");
@@ -50,7 +52,7 @@ function pintarPaleta() {
   const cont = document.getElementById("paleta-discos");
   cont.innerHTML = TAMANOS.map(
     (gb) => `
-    <button class="disk-card" ${discos.length >= MAX_BAHIAS ? "disabled" : ""} onclick="agregarDisco(${gb})" aria-label="Insertar disco de ${formatoCapacidad(gb)}">
+    <button class="disk-card" ${discos.length >= MAX_BAHIAS ? "disabled" : ""} data-capacidad="${gb}" aria-label="Insertar disco de ${formatoCapacidad(gb)}">
       <span class="disk-card-visual">
         <span class="disk-card-cap mono">${formatoCapacidad(gb)}</span>
         <img src="assets/img/disco.webp" alt="">
@@ -81,7 +83,7 @@ function pintarChasis() {
         <div class="bay filled">
           <span class="bay-num">${i + 1}</span>
           <span class="bay-capacity mono">${formatoCapacidad(disco.capacidad)}</span>
-          <button class="bay-eject" onclick="quitarDisco(${disco.id})" aria-label="Expulsar disco ${i + 1}" title="Expulsar disco">
+          <button class="bay-eject" data-id="${disco.id}" aria-label="Expulsar disco ${i + 1}" title="Expulsar disco">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5l7.5 8.2H4.5L12 4.5z"/><rect x="4.5" y="16.2" width="15" height="3.2" rx="1"/></svg>
           </button>
         </div>`;
@@ -320,13 +322,28 @@ window.addEventListener("resize", () => {
 /* ============================================================
    EVENTOS
    ============================================================ */
+document.getElementById("paleta-discos").addEventListener("click", (e) => {
+  const card = e.target.closest(".disk-card");
+  if (!card || card.disabled) return;
+  agregarDisco(Number(card.dataset.capacidad));
+});
+
+document.getElementById("bay-grid").addEventListener("click", (e) => {
+  const btn = e.target.closest(".bay-eject");
+  if (!btn) return;
+  quitarDisco(Number(btn.dataset.id));
+});
+
 paneles[1].select.addEventListener("change", () => actualizarPanel(1));
 paneles[2].select.addEventListener("change", () => actualizarPanel(2));
 
 const modal = document.getElementById("myModal");
-document.getElementById("myBtn").onclick = () => modal.classList.add("open");
-document.getElementById("modalClose").onclick = () =>
-  modal.classList.remove("open");
+document
+  .getElementById("myBtn")
+  .addEventListener("click", () => modal.classList.add("open"));
+document
+  .getElementById("modalClose")
+  .addEventListener("click", () => modal.classList.remove("open"));
 window.addEventListener("click", (e) => {
   if (e.target === modal) modal.classList.remove("open");
 });
