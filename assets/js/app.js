@@ -46,7 +46,7 @@ function pintarPaleta() {
       <span class="disk-card-visual">
         <span class="disk-card-cap mono">${formatoCapacidad(gb)}</span>
         <img src="assets/img/disco.webp" alt="">
-        <span class="disk-card-add" aria-hidden="true">+</span>
+        <span class="disk-card-add" aria-hidden="true">+${formatoCapacidad(gb)}</span>
       </span>
     </button>
   `,
@@ -191,6 +191,8 @@ function actualizarPanel(idx) {
   msgBox.innerHTML = r.valido
     ? ""
     : `<div class="panel-msg">${r.mensaje}</div>`;
+
+  panel.select.classList.toggle("has-error", !r.valido);
 
   const capacidad = r.valido ? r.capacidad : 0;
   const seguridad = r.valido ? r.seguridad : 0;
