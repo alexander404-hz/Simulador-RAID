@@ -1371,9 +1371,15 @@ footer a {
 .write-grid {
   display: flex;
   justify-content: center;
+  justify-content: safe center;
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 8px;
+}
+@media (max-width: 900px) {
+  .write-grid {
+    justify-content: flex-start;
+  }
 }
 .write-col {
   flex: 0 0 96px;
