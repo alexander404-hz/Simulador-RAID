@@ -898,6 +898,10 @@ section.block {
   margin-bottom: 8px;
   font-family: var(--font-mono);
 }
+.chart-box .label .unit {
+  color: var(--text-dim);
+  opacity: 0.6;
+}
 .chart-pie-wrap {
   height: 220px;
   width: 100%;

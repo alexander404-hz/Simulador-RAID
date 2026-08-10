@@ -241,6 +241,11 @@ function crearPie(idx) {
           position: "bottom",
           labels: { boxWidth: 10, boxHeight: 10, padding: 14 },
         },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.label}: ${ctx.parsed} GB`,
+          },
+        },
       },
     },
   });
@@ -262,9 +267,19 @@ function crearBar(idx) {
       indexAxis: "y",
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.x} GB`,
+          },
+        },
+      },
       scales: {
-        x: { stacked: true, grid: { color: "#1c2438" } },
+        x: {
+          stacked: true,
+          grid: { color: "#1c2438" },
+        },
         y: { stacked: true, grid: { display: false } },
       },
     },
