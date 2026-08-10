@@ -43,9 +43,11 @@ function pintarPaleta() {
   cont.innerHTML = TAMANOS.map(
     (gb) => `
     <button class="disk-card" ${discos.length >= MAX_BAHIAS ? "disabled" : ""} onclick="agregarDisco(${gb})" aria-label="Insertar disco de ${formatoCapacidad(gb)}">
-      <img src="assets/img/disco.webp" alt="">
-      <span>${formatoCapacidad(gb)}</span>
-      <small>insertar</small>
+      <span class="disk-card-cap mono">${formatoCapacidad(gb)}</span>
+      <span class="disk-card-visual">
+        <img src="assets/img/disco.webp" alt="">
+        <span class="disk-card-add" aria-hidden="true">+</span>
+      </span>
     </button>
   `,
   ).join("");
@@ -71,7 +73,9 @@ function pintarChasis() {
         <div class="bay filled">
           <span class="bay-num">${i + 1}</span>
           <span class="bay-capacity mono">${formatoCapacidad(disco.capacidad)}</span>
-          <button class="bay-remove" onclick="quitarDisco(${disco.id})" aria-label="Quitar disco ${i + 1}">×</button>
+          <button class="bay-eject" onclick="quitarDisco(${disco.id})" aria-label="Expulsar disco ${i + 1}" title="Expulsar disco">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5l7.5 8.2H4.5L12 4.5z"/><rect x="4.5" y="16.2" width="15" height="3.2" rx="1"/></svg>
+          </button>
         </div>`;
     } else {
       grid.innerHTML += `<div class="bay"><span class="bay-num">${i + 1}</span></div>`;
