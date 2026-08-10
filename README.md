@@ -140,7 +140,7 @@ El proyecto se despliega en **GitHub Pages** desde este mismo repositorio.
 
 ## 👤 Autor
 
-**Alexander Hernández**
+**Alexander Hz**
 Portafolio: [alexander404-hz.github.io/Portafolio](https://alexander404-hz.github.io/Portafolio/)
 
 ---
