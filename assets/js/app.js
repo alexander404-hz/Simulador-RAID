@@ -638,19 +638,11 @@ function simularEscritura() {
 }
 
 function revisarEscrituraTrasCambio() {
-  if (ultimoLayout && ultimoLayout.n !== discos.length) {
-    ultimoLayout = null;
-    writeEls.grid.innerHTML = "";
-    writeEls.msg.innerHTML =
-      '<div class="panel-msg">Los discos cambiaron. Vuelve a presionar "Simular escritura".</div>';
-    const estadoBox = document.getElementById("write-estado");
-    if (estadoBox) {
-      estadoBox.innerHTML = "";
-      estadoBox.className = "estado-banner";
-    }
-  } else if (ultimoLayout) {
-    // Los discos siguen siendo los mismos, pero pudo cambiar quién está encendido.
-    pintarEscritura();
+  // Ya no hay botón "Simular escritura": si había algo escrito (o ya se
+  // había simulado antes), recalculamos solos con la nueva cantidad de
+  // discos y/o el nuevo estado de energía.
+  if (ultimoLayout || writeEls.input.value.trim()) {
+    simularEscritura();
   }
 }
 
