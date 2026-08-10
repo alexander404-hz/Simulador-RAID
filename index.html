@@ -84,8 +84,8 @@
               Selecciona una capacidad para insertarla en la próxima bahía
               libre. Puedes combinar tamaños distintos: el arreglo siempre
               calculará usando el disco más pequeño como referencia. Usa el
-              botón de encendido de cada disco insertado para simular una
-              falla y ver si el arreglo sobrevive.
+              botón de encendido de cada disco insertado para simular una falla
+              y ver si el arreglo sobrevive.
             </p>
           </div>
         </div>
@@ -128,10 +128,11 @@
             <h2>Mira cómo se escribe un dato</h2>
             <p>
               Usa los mismos discos que insertaste en la sección 1. Escribe un
-              texto y elige un nivel RAID para ver, disco por disco, dónde
-              queda cada bloque, dónde se duplica y dónde vive la paridad.
-              Luego apaga un disco arriba para simular su falla y observa en
-              vivo si el dato se pierde o si el RAID logra reconstruirlo.
+              texto o elige un nivel RAID y la simulación se actualiza sola,
+              disco por disco, mostrando dónde queda cada bloque, dónde se
+              duplica y dónde vive la paridad. Luego apaga un disco arriba para
+              simular su falla y observa en vivo si el dato se pierde o si el
+              RAID logra reconstruirlo.
             </p>
           </div>
         </div>
@@ -152,10 +153,8 @@
               class="write-input"
               maxlength="24"
               placeholder="Escribe un texto, ej: HOLA MUNDO"
+              autocomplete="off"
             />
-            <button class="btn btn-primary" id="write-btn">
-              Simular escritura
-            </button>
             <label class="write-toggle">
               <input type="checkbox" id="write-binario" />
               Ver en binario
@@ -191,7 +190,6 @@
         </div>
       </section>
 
-      
       <section class="block wrap" id="compare">
         <div class="section-head">
           <span class="tag">03</span>

@@ -459,7 +459,6 @@ function crearBar(idx) {
 const writeEls = {
   select: document.getElementById("write-select"),
   input: document.getElementById("write-input"),
-  btn: document.getElementById("write-btn"),
   binario: document.getElementById("write-binario"),
   msg: document.getElementById("write-msg"),
   grid: document.getElementById("write-grid"),
@@ -713,10 +712,14 @@ window.addEventListener("click", (e) => {
   if (e.target === modal) modal.classList.remove("open");
 });
 
-writeEls.btn.addEventListener("click", simularEscritura);
+writeEls.select.addEventListener("change", simularEscritura);
 writeEls.binario.addEventListener("change", pintarEscritura);
-writeEls.input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") simularEscritura();
+
+let writeDebounceTimer = null;
+const WRITE_DEBOUNCE_MS = 400;
+writeEls.input.addEventListener("input", () => {
+  clearTimeout(writeDebounceTimer);
+  writeDebounceTimer = setTimeout(simularEscritura, WRITE_DEBOUNCE_MS);
 });
 
 /* ============================================================
