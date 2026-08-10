@@ -74,6 +74,16 @@ button {
   }
 }
 
+main {
+  padding-inline: 2rem;
+}
+
+@media (max-width: 480px) {
+  main {
+    padding-inline: 1rem;
+  }
+}
+
 .wrap {
   max-width: 1180px;
   margin: 0 auto;
@@ -440,7 +450,6 @@ section.block {
   background-repeat: no-repeat;
   background-size: cover;
 
-  border: 1px solid var(--border);
   border-radius: 20px;
 }
 
@@ -465,8 +474,8 @@ section.block {
 }
 
 .chassis-rail {
-  margin: 3.8rem 0.3rem 0.75rem 0.55rem;
-  padding: 0.4rem 0.75rem;
+  margin: 3.65rem 0.3rem 0.75rem 0.55rem;
+  padding: 0.2rem 0.58rem;
   background: #2c2c2c;
 
   border: 1px solid #393939;
@@ -475,15 +484,15 @@ section.block {
 
 @media (max-width: 900px) {
   .chassis-rail {
-    margin: 3.65rem 0.4rem 0rem 0.6rem;
-    padding: 0.3rem 0.65rem;
+    margin: 3.25rem 0.4rem 0rem 0.6rem;
+    padding: 0.1rem 0.65rem;
   }
 }
 
 @media (max-width: 480px) {
   .chassis-rail {
     margin: 5rem 0.35rem 0rem 0.65rem;
-    padding: 0.3rem 0.65rem;
+    padding: 0.3rem 0.4rem;
   }
 }
 
