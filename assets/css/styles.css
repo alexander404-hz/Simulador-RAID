@@ -50,6 +50,14 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
+main {
+  padding-inline: 2rem;
+}
+@media (max-width: 480px) {
+  .main {
+    padding-inline: 1rem;
+  }
+}
 h1,
 h2,
 h3 {
@@ -514,8 +522,8 @@ section.block {
 }
 
 .chassis-rail {
-  margin: 3.8rem 0.3rem 0.75rem 0.55rem;
-  padding: 0.4rem 0.75rem;
+  margin: 3.6rem 0.3rem 0.75rem 0.55rem;
+  padding: 0.2rem 0.58rem;
   background: #2c2c2c;
 
   border: 1px solid #393939;
@@ -524,15 +532,15 @@ section.block {
 
 @media (max-width: 900px) {
   .chassis-rail {
-    margin: 3.65rem 0.4rem 0rem 0.6rem;
-    padding: 0.3rem 0.65rem;
+    margin: 3.2rem 0.4rem 0 0.6rem;
+    padding: 0rem 0.65rem;
   }
 }
 
 @media (max-width: 480px) {
   .chassis-rail {
-    margin: 5rem 0.35rem 0rem 0.65rem;
-    padding: 0.3rem 0.65rem;
+    margin: 5rem 0.35rem 0 0.65rem;
+    padding: 0.3rem 0.2rem;
   }
 }
 
@@ -774,7 +782,6 @@ section.block {
 @media (max-width: 480px) {
   .bay-eject {
     right: 2px;
-
   }
   .bay-eject svg {
     width: 9px;
@@ -1166,6 +1173,7 @@ footer a {
 
 .write-grid {
   display: flex;
+  justify-content: center;
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 8px;
@@ -1238,6 +1246,7 @@ footer a {
 
 .write-legend {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 18px;
   margin-top: 16px;
