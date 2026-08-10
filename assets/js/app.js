@@ -113,6 +113,7 @@ function refrescarTodo() {
   pintarChasis();
   actualizarPanel(1);
   actualizarPanel(2);
+  revisarEscrituraTrasCambio();
 }
 
 /* ============================================================
@@ -298,6 +299,172 @@ function crearBar(idx) {
 }
 
 /* ============================================================
+   ESCRITURA DE DATOS (sección 3)
+   ============================================================ */
+const writeEls = {
+  select: document.getElementById("write-select"),
+  input: document.getElementById("write-input"),
+  btn: document.getElementById("write-btn"),
+  binario: document.getElementById("write-binario"),
+  msg: document.getElementById("write-msg"),
+  grid: document.getElementById("write-grid"),
+};
+
+let ultimoLayout = null; // { n, filas, matrix } — matrix[fila][disco] = { tipo, valor }
+
+function xorCaracteres(chars) {
+  let acc = chars[0].charCodeAt(0);
+  for (let i = 1; i < chars.length; i++) acc ^= chars[i].charCodeAt(0);
+  return acc;
+}
+
+function calcularLayoutEscritura(tipo, n, palabra) {
+  const MAX_FILAS = 6;
+  let dataPorFila;
+  if (tipo === "1") dataPorFila = 1;
+  else if (tipo === "3" || tipo === "5") dataPorFila = n - 1;
+  else if (tipo === "10" || tipo === "01") dataPorFila = n / 2;
+  else dataPorFila = n; // RAID 0
+
+  const filas = Math.min(
+    MAX_FILAS,
+    Math.max(1, Math.ceil(palabra.length / dataPorFila)),
+  );
+  const matrix = [];
+
+  for (let f = 0; f < filas; f++) {
+    const fila = new Array(n).fill(null);
+    switch (tipo) {
+      case "0":
+        for (let c = 0; c < n; c++) {
+          fila[c] = { tipo: "data", valor: palabra[(f * n + c) % palabra.length] };
+        }
+        break;
+      case "1": {
+        const ch = palabra[f % palabra.length];
+        for (let c = 0; c < n; c++) {
+          fila[c] = { tipo: c === 0 ? "data" : "mirror", valor: ch };
+        }
+        break;
+      }
+      case "3":
+      case "5": {
+        const parityCol = tipo === "3" ? n - 1 : n - 1 - (f % n);
+        let j = 0;
+        for (let c = 0; c < n; c++) {
+          if (c === parityCol) continue;
+          fila[c] = {
+            tipo: "data",
+            valor: palabra[(f * (n - 1) + j) % palabra.length],
+          };
+          j++;
+        }
+        const chars = fila.filter(Boolean).map((cell) => cell.valor);
+        fila[parityCol] = {
+          tipo: "paridad",
+          valor: xorCaracteres(chars).toString(2).padStart(8, "0"),
+        };
+        break;
+      }
+      case "10": {
+        const pares = n / 2;
+        for (let p = 0; p < pares; p++) {
+          const ch = palabra[(f * pares + p) % palabra.length];
+          fila[p * 2] = { tipo: "data", valor: ch };
+          fila[p * 2 + 1] = { tipo: "mirror", valor: ch };
+        }
+        break;
+      }
+      case "01": {
+        const half = n / 2;
+        for (let c = 0; c < half; c++) {
+          const ch = palabra[(f * half + c) % palabra.length];
+          fila[c] = { tipo: "data", valor: ch };
+          fila[c + half] = { tipo: "mirror", valor: ch };
+        }
+        break;
+      }
+    }
+    matrix.push(fila);
+  }
+  return { n, filas, matrix };
+}
+
+function formatoCelda(cell) {
+  if (cell.tipo === "paridad") return cell.valor; // ya viene en binario
+  if (writeEls.binario.checked) {
+    return cell.valor.charCodeAt(0).toString(2).padStart(8, "0");
+  }
+  return cell.valor === " " ? "␣" : cell.valor;
+}
+
+function etiquetaCelda(tipo) {
+  if (tipo === "mirror") return "copia";
+  if (tipo === "paridad") return "xor";
+  return "dato";
+}
+
+function pintarEscritura() {
+  if (!ultimoLayout) return;
+  const { n, matrix } = ultimoLayout;
+
+  let html = "";
+  for (let c = 0; c < n; c++) {
+    const disco = discos[c];
+    html += `<div class="write-col">
+      <div class="write-col-head mono">Disco ${c + 1}<span>${formatoCapacidad(disco.capacidad)}</span></div>`;
+    matrix.forEach((fila, f) => {
+      const cell = fila[c];
+      html += `<div class="write-cell ${cell.tipo}" style="transition-delay:${f * 70}ms">
+        <span class="write-cell-tag">${etiquetaCelda(cell.tipo)}</span>
+        <span class="write-cell-val mono">${formatoCelda(cell)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  writeEls.grid.innerHTML = html;
+
+  requestAnimationFrame(() => {
+    writeEls.grid
+      .querySelectorAll(".write-cell")
+      .forEach((el) => el.classList.add("in"));
+  });
+}
+
+function simularEscritura() {
+  const tipo = writeEls.select.value;
+  const palabra = writeEls.input.value.trim();
+  const val = validarRaid(tipo);
+
+  writeEls.grid.innerHTML = "";
+
+  if (!val.valido) {
+    writeEls.msg.innerHTML = `<div class="panel-msg">${val.mensaje}</div>`;
+    ultimoLayout = null;
+    return;
+  }
+  if (!palabra) {
+    writeEls.msg.innerHTML =
+      '<div class="panel-msg">Escribe un texto para simular su escritura.</div>';
+    ultimoLayout = null;
+    return;
+  }
+
+  writeEls.msg.innerHTML = "";
+  ultimoLayout = calcularLayoutEscritura(tipo, discos.length, palabra);
+  pintarEscritura();
+}
+
+function revisarEscrituraTrasCambio() {
+  if (ultimoLayout && ultimoLayout.n !== discos.length) {
+    ultimoLayout = null;
+    writeEls.grid.innerHTML = "";
+    writeEls.msg.innerHTML =
+      '<div class="panel-msg">Los discos cambiaron. Vuelve a presionar "Simular escritura".</div>';
+  }
+}
+
+/* ============================================================
    RESPONSIVE: MAX_BAHIAS según ancho de pantalla
    ============================================================ */
 function actualizarMaxBahias() {
@@ -347,6 +514,12 @@ document
   .addEventListener("click", () => modal.classList.remove("open"));
 window.addEventListener("click", (e) => {
   if (e.target === modal) modal.classList.remove("open");
+});
+
+writeEls.btn.addEventListener("click", simularEscritura);
+writeEls.binario.addEventListener("change", pintarEscritura);
+writeEls.input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") simularEscritura();
 });
 
 /* ============================================================

@@ -55,6 +55,7 @@
         <nav>
           <a href="#builder">Discos</a>
           <a href="#compare">Comparar</a>
+          <a href="#escritura">Escritura</a>
         </nav>
       </div>
     </header>
@@ -223,6 +224,65 @@
             <div class="chart-box">
               <div class="label">Proporción <span class="unit">(GB)</span></div>
               <div class="chart-bar-wrap"><canvas id="chartBar2"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block wrap" id="escritura">
+        <div class="section-head">
+          <span class="tag">03</span>
+          <div>
+            <h2>Mira cómo se escribe un dato</h2>
+            <p>
+              Usa los mismos discos que insertaste en la sección 1. Escribe un
+              texto y elige un nivel RAID para ver, disco por disco, dónde
+              queda cada bloque, dónde se duplica y dónde vive la paridad.
+            </p>
+          </div>
+        </div>
+
+        <div class="raid-panel">
+          <div class="write-controls">
+            <select class="raid-select" id="write-select">
+              <option value="0" selected>RAID 0 — Striping</option>
+              <option value="1">RAID 1 — Espejo</option>
+              <option value="3">RAID 3 — Paridad dedicada</option>
+              <option value="5">RAID 5 — Paridad distribuida</option>
+              <option value="01">RAID 01 — Espejo de divisiones</option>
+              <option value="10">RAID 10 — División de espejos</option>
+            </select>
+            <input
+              type="text"
+              id="write-input"
+              class="write-input"
+              maxlength="24"
+              placeholder="Escribe un texto, ej: HOLA MUNDO"
+            />
+            <button class="btn btn-primary" id="write-btn">
+              Simular escritura
+            </button>
+            <label class="write-toggle">
+              <input type="checkbox" id="write-binario" />
+              Ver en binario
+            </label>
+          </div>
+
+          <div id="write-msg"></div>
+          <div class="write-grid" id="write-grid"></div>
+
+          <div class="write-legend">
+            <div class="write-legend-item">
+              <span class="swatch" style="background: var(--teal)"></span>
+              Dato
+            </div>
+            <div class="write-legend-item">
+              <span class="swatch" style="background: var(--mirror)"></span>
+              Copia (mirroring)
+            </div>
+            <div class="write-legend-item">
+              <span class="swatch" style="background: var(--accent)"></span>
+              Paridad (XOR)
             </div>
           </div>
         </div>
