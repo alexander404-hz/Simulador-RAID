@@ -9,7 +9,7 @@ let MAX_BAHIAS =
     ? MAX_BAHIAS_DESKTOP
     : MAX_BAHIAS_COMPACTO;
 const TAMANOS = [500, 1000, 2000, 3000, 4000, 6000, 8000, 10000];
-let discos = []; // { id, capacidad }
+let discos = []; // { id, capacidad, activo }
 let nextId = 0;
 
 const paneles = {
@@ -71,8 +71,10 @@ function pintarChasis() {
   const rail = document.getElementById("rail-disks");
   rail.innerHTML = "";
   for (let i = 0; i < MAX_BAHIAS; i++) {
-    const activo = i < discos.length;
-    rail.innerHTML += `<div class="rail-row ${activo ? "active" : ""}"><span class="dot"></span>DISK ${i + 1}</div>`;
+    const disco = discos[i];
+    let clase = "";
+    if (disco) clase = disco.activo === false ? "down" : "active";
+    rail.innerHTML += `<div class="rail-row ${clase}"><span class="dot"></span>DISK ${i + 1}</div>`;
   }
 
   const grid = document.getElementById("bay-grid");
@@ -80,10 +82,15 @@ function pintarChasis() {
   for (let i = 0; i < MAX_BAHIAS; i++) {
     const disco = discos[i];
     if (disco) {
+      const caido = disco.activo === false;
       grid.innerHTML += `
-        <div class="bay filled">
+        <div class="bay filled ${caido ? "down" : ""}">
           <span class="bay-num">${i + 1}</span>
           <span class="bay-capacity mono">${formatoCapacidad(disco.capacidad)}</span>
+          ${caido ? '<span class="bay-fault">FALLO</span>' : ""}
+          <button class="bay-power ${caido ? "is-off" : "is-on"}" data-id="${disco.id}" aria-label="${caido ? "Encender" : "Apagar"} disco ${i + 1}" title="${caido ? "Encender disco (reparar)" : "Apagar disco (simular falla)"}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v7"/><path d="M6.5 6.5a7 7 0 1 0 11 0"/></svg>
+          </button>
           <button class="bay-eject" data-id="${disco.id}" aria-label="Expulsar disco ${i + 1}" title="Expulsar disco">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5l7.5 8.2H4.5L12 4.5z"/><rect x="4.5" y="16.2" width="15" height="3.2" rx="1"/></svg>
           </button>
@@ -99,12 +106,19 @@ function pintarChasis() {
 
 function agregarDisco(capacidad) {
   if (discos.length >= MAX_BAHIAS) return;
-  discos.push({ id: nextId++, capacidad });
+  discos.push({ id: nextId++, capacidad, activo: true });
   refrescarTodo();
 }
 
 function quitarDisco(id) {
   discos = discos.filter((d) => d.id !== id);
+  refrescarTodo();
+}
+
+function alternarEnergiaDisco(id) {
+  const disco = discos.find((d) => d.id === id);
+  if (!disco) return;
+  disco.activo = disco.activo === false ? true : false;
   refrescarTodo();
 }
 
@@ -183,6 +197,128 @@ function validarRaid(tipo) {
 }
 
 /* ============================================================
+   TOLERANCIA A FALLOS (simulación de discos caídos)
+   ============================================================ */
+function indicesCaidos() {
+  const arr = [];
+  discos.forEach((d, i) => {
+    if (d.activo === false) arr.push(i);
+  });
+  return arr;
+}
+
+// Para RAID 10 y 01: devuelve las parejas de columnas que deben
+// conservar al menos un disco vivo para no perder esa porción de datos.
+function paresRaid(tipo, n) {
+  if (tipo === "10") {
+    const pares = [];
+    for (let p = 0; p < n / 2; p++) pares.push([p * 2, p * 2 + 1]);
+    return pares;
+  }
+  if (tipo === "01") {
+    const half = n / 2;
+    const pares = [];
+    for (let c = 0; c < half; c++) pares.push([c, c + half]);
+    return pares;
+  }
+  return null;
+}
+
+// Evalúa qué le pasa al arreglo completo con los discos caídos actuales.
+// estado: "ok" (todo sano) | "degradado" (hay fallas pero se reconstruye) | "perdida" (datos irrecuperables)
+function estadoTolerancia(tipo, n, caidos) {
+  if (caidos.length === 0) {
+    return { estado: "ok", mensaje: "Todos los discos operativos." };
+  }
+  switch (tipo) {
+    case "0":
+      return {
+        estado: "perdida",
+        mensaje:
+          "RAID 0 no tiene redundancia: con un solo disco caído se pierde todo el arreglo.",
+      };
+    case "1":
+      if (caidos.length >= n) {
+        return {
+          estado: "perdida",
+          mensaje: "Cayeron todas las copias: los datos se perdieron.",
+        };
+      }
+      return {
+        estado: "degradado",
+        mensaje: `${caidos.length} disco(s) caído(s), pero queda al menos una copia viva: los datos siguen disponibles.`,
+      };
+    case "3":
+    case "5":
+      if (caidos.length === 1) {
+        return {
+          estado: "degradado",
+          mensaje:
+            "1 disco caído: la paridad reconstruye en vivo los datos que faltan.",
+        };
+      }
+      return {
+        estado: "perdida",
+        mensaje:
+          "Más de un disco caído: la paridad ya no alcanza para reconstruir todo. Hay pérdida de datos.",
+      };
+    case "10":
+    case "01": {
+      const pares = paresRaid(tipo, n);
+      let parPerdido = false;
+      let hayFalloParcial = false;
+      pares.forEach((par) => {
+        const muertos = par.filter((c) => caidos.includes(c)).length;
+        if (muertos === par.length) parPerdido = true;
+        else if (muertos > 0) hayFalloParcial = true;
+      });
+      if (parPerdido) {
+        return {
+          estado: "perdida",
+          mensaje:
+            "Un grupo espejado perdió ambos discos: esa parte de los datos ya no se puede recuperar.",
+        };
+      }
+      if (hayFalloParcial) {
+        return {
+          estado: "degradado",
+          mensaje:
+            "Hay discos caídos, pero cada pareja conserva al menos una copia: el RAID reconstruye los datos.",
+        };
+      }
+      return { estado: "ok", mensaje: "Todos los discos operativos." };
+    }
+    default:
+      return { estado: "ok", mensaje: "" };
+  }
+}
+
+// Estado de una celda de escritura (por columna/disco) dado el tipo de RAID.
+function estadoCelda(tipo, n, caidos, col) {
+  if (!caidos.includes(col)) return "ok";
+  switch (tipo) {
+    case "0":
+      return "perdido";
+    case "1": {
+      const otroVivo = discos.some((d, i) => i !== col && d.activo !== false);
+      return otroVivo ? "recuperado" : "perdido";
+    }
+    case "3":
+    case "5":
+      return caidos.length === 1 ? "recuperado" : "perdido";
+    case "10":
+    case "01": {
+      const pares = paresRaid(tipo, n);
+      const par = pares.find((p) => p.includes(col));
+      const companero = par.find((c) => c !== col);
+      return caidos.includes(companero) ? "perdido" : "recuperado";
+    }
+    default:
+      return "ok";
+  }
+}
+
+/* ============================================================
    RENDER DE PANELES + GRÁFICOS
    ============================================================ */
 function actualizarPanel(idx) {
@@ -205,6 +341,25 @@ function actualizarPanel(idx) {
     : `<div class="panel-msg">${r.mensaje}</div>`;
 
   panel.select.classList.toggle("has-error", !r.valido);
+
+  const estadoBox = document.getElementById("panel" + idx + "-estado");
+  if (estadoBox) {
+    if (!r.valido) {
+      estadoBox.innerHTML = "";
+      estadoBox.className = "estado-pill";
+    } else {
+      const est = estadoTolerancia(panel.tipo, discos.length, indicesCaidos());
+      const etiqueta =
+        est.estado === "ok"
+          ? "Operativo"
+          : est.estado === "degradado"
+            ? "Degradado — se reconstruye"
+            : "Pérdida de datos";
+      estadoBox.className = "estado-pill " + est.estado;
+      estadoBox.innerHTML = `<span class="dot"></span>${etiqueta}`;
+      estadoBox.title = est.mensaje;
+    }
+  }
 
   const capacidad = r.valido ? r.capacidad : 0;
   const seguridad = r.valido ? r.seguridad : 0;
@@ -310,7 +465,7 @@ const writeEls = {
   grid: document.getElementById("write-grid"),
 };
 
-let ultimoLayout = null; // { n, filas, matrix } — matrix[fila][disco] = { tipo, valor }
+let ultimoLayout = null; // { n, filas, matrix, tipo } — matrix[fila][disco] = { tipo, valor }
 
 function xorCaracteres(chars) {
   let acc = chars[0].charCodeAt(0);
@@ -387,10 +542,11 @@ function calcularLayoutEscritura(tipo, n, palabra) {
     }
     matrix.push(fila);
   }
-  return { n, filas, matrix };
+  return { n, filas, matrix, tipo };
 }
 
-function formatoCelda(cell) {
+function formatoCelda(cell, estado) {
+  if (estado === "perdido") return "×";
   if (cell.tipo === "paridad") return cell.valor; // ya viene en binario
   if (writeEls.binario.checked) {
     return cell.valor.charCodeAt(0).toString(2).padStart(8, "0");
@@ -398,7 +554,9 @@ function formatoCelda(cell) {
   return cell.valor === " " ? "␣" : cell.valor;
 }
 
-function etiquetaCelda(tipo) {
+function etiquetaCelda(tipo, estado) {
+  if (estado === "perdido") return "perdido";
+  if (estado === "recuperado") return "reconstruido";
   if (tipo === "mirror") return "copia";
   if (tipo === "paridad") return "xor";
   return "dato";
@@ -407,17 +565,21 @@ function etiquetaCelda(tipo) {
 function pintarEscritura() {
   if (!ultimoLayout) return;
   const { n, matrix } = ultimoLayout;
+  const tipo = ultimoLayout.tipo;
+  const caidos = indicesCaidos();
 
   let html = "";
   for (let c = 0; c < n; c++) {
     const disco = discos[c];
-    html += `<div class="write-col">
-      <div class="write-col-head mono">Disco ${c + 1}<span>${formatoCapacidad(disco.capacidad)}</span></div>`;
+    const columnaCaida = caidos.includes(c);
+    html += `<div class="write-col ${columnaCaida ? "down" : ""}">
+      <div class="write-col-head mono">Disco ${c + 1}<span>${formatoCapacidad(disco.capacidad)}</span>${columnaCaida ? '<span class="write-col-fault">FALLO</span>' : ""}</div>`;
     matrix.forEach((fila, f) => {
       const cell = fila[c];
-      html += `<div class="write-cell ${cell.tipo}" style="transition-delay:${f * 70}ms">
-        <span class="write-cell-tag">${etiquetaCelda(cell.tipo)}</span>
-        <span class="write-cell-val mono">${formatoCelda(cell)}</span>
+      const estado = estadoCelda(tipo, n, caidos, c);
+      html += `<div class="write-cell ${cell.tipo} ${estado !== "ok" ? "is-" + estado : ""}" style="transition-delay:${f * 70}ms">
+        <span class="write-cell-tag">${etiquetaCelda(cell.tipo, estado)}</span>
+        <span class="write-cell-val mono">${formatoCelda(cell, estado)}</span>
       </div>`;
     });
     html += `</div>`;
@@ -429,6 +591,22 @@ function pintarEscritura() {
       .querySelectorAll(".write-cell")
       .forEach((el) => el.classList.add("in"));
   });
+
+  pintarEstadoEscritura(tipo, n, caidos);
+}
+
+function pintarEstadoEscritura(tipo, n, caidos) {
+  const box = document.getElementById("write-estado");
+  if (!box) return;
+  const est = estadoTolerancia(tipo, n, caidos);
+  const etiqueta =
+    est.estado === "ok"
+      ? "Datos íntegros"
+      : est.estado === "degradado"
+        ? "Degradado: el RAID está reconstruyendo los datos"
+        : "Pérdida de datos";
+  box.className = "estado-banner " + est.estado;
+  box.innerHTML = `<span class="dot"></span><div><b>${etiqueta}.</b> ${est.mensaje}</div>`;
 }
 
 function simularEscritura() {
@@ -437,6 +615,11 @@ function simularEscritura() {
   const val = validarRaid(tipo);
 
   writeEls.grid.innerHTML = "";
+  writeEls.estado = document.getElementById("write-estado");
+  if (writeEls.estado) {
+    writeEls.estado.innerHTML = "";
+    writeEls.estado.className = "estado-banner";
+  }
 
   if (!val.valido) {
     writeEls.msg.innerHTML = `<div class="panel-msg">${val.mensaje}</div>`;
@@ -461,6 +644,14 @@ function revisarEscrituraTrasCambio() {
     writeEls.grid.innerHTML = "";
     writeEls.msg.innerHTML =
       '<div class="panel-msg">Los discos cambiaron. Vuelve a presionar "Simular escritura".</div>';
+    const estadoBox = document.getElementById("write-estado");
+    if (estadoBox) {
+      estadoBox.innerHTML = "";
+      estadoBox.className = "estado-banner";
+    }
+  } else if (ultimoLayout) {
+    // Los discos siguen siendo los mismos, pero pudo cambiar quién está encendido.
+    pintarEscritura();
   }
 }
 
@@ -497,9 +688,15 @@ document.getElementById("paleta-discos").addEventListener("click", (e) => {
 });
 
 document.getElementById("bay-grid").addEventListener("click", (e) => {
-  const btn = e.target.closest(".bay-eject");
-  if (!btn) return;
-  quitarDisco(Number(btn.dataset.id));
+  const powerBtn = e.target.closest(".bay-power");
+  if (powerBtn) {
+    alternarEnergiaDisco(Number(powerBtn.dataset.id));
+    return;
+  }
+  const ejectBtn = e.target.closest(".bay-eject");
+  if (ejectBtn) {
+    quitarDisco(Number(ejectBtn.dataset.id));
+  }
 });
 
 paneles[1].select.addEventListener("change", () => actualizarPanel(1));

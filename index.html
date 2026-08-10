@@ -83,7 +83,9 @@
             <p>
               Selecciona una capacidad para insertarla en la próxima bahía
               libre. Puedes combinar tamaños distintos: el arreglo siempre
-              calculará usando el disco más pequeño como referencia.
+              calculará usando el disco más pequeño como referencia. Usa el
+              botón de encendido de cada disco insertado para simular una
+              falla y ver si el arreglo sobrevive.
             </p>
           </div>
         </div>
@@ -142,6 +144,7 @@
               <option value="01">RAID 01 — Espejo de divisiones</option>
               <option value="10">RAID 10 — División de espejos</option>
             </select>
+            <div id="panel1-estado" class="estado-pill"></div>
             <div id="panel1-msg"></div>
             <div class="stat-grid">
               <div class="stat">
@@ -189,6 +192,7 @@
               <option value="01">RAID 01 — Espejo de divisiones</option>
               <option value="10">RAID 10 — División de espejos</option>
             </select>
+            <div id="panel2-estado" class="estado-pill"></div>
             <div id="panel2-msg"></div>
             <div class="stat-grid">
               <div class="stat">
@@ -238,6 +242,8 @@
               Usa los mismos discos que insertaste en la sección 1. Escribe un
               texto y elige un nivel RAID para ver, disco por disco, dónde
               queda cada bloque, dónde se duplica y dónde vive la paridad.
+              Luego apaga un disco arriba para simular su falla y observa en
+              vivo si el dato se pierde o si el RAID logra reconstruirlo.
             </p>
           </div>
         </div>
@@ -269,6 +275,7 @@
           </div>
 
           <div id="write-msg"></div>
+          <div id="write-estado" class="estado-banner"></div>
           <div class="write-grid" id="write-grid"></div>
 
           <div class="write-legend">
@@ -283,6 +290,14 @@
             <div class="write-legend-item">
               <span class="swatch" style="background: var(--accent)"></span>
               Paridad (XOR)
+            </div>
+            <div class="write-legend-item">
+              <span class="swatch swatch-recuperado"></span>
+              Reconstruido tras la falla
+            </div>
+            <div class="write-legend-item">
+              <span class="swatch" style="background: var(--danger)"></span>
+              Dato perdido
             </div>
           </div>
         </div>
