@@ -27,9 +27,17 @@ const paneles = {
   },
 };
 
-const COLOR_CAPACIDAD = "#2dd4bf";
-const COLOR_SEGURIDAD = "#ffb100";
-const COLOR_SINUSAR = "#3a4360";
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+const COLOR_CAPACIDAD = cssVar("--teal");
+const COLOR_SEGURIDAD = cssVar("--accent");
+const COLOR_SINUSAR = cssVar("--sin-usar");
+const COLOR_TEXT_MUTED = cssVar("--text-muted");
+const COLOR_GRID = cssVar("--chart-grid");
+const COLOR_GRID_SOFT = cssVar("--border-soft");
+const COLOR_PANEL_BG = cssVar("--bg-panel");
 
 /* ============================================================
    PALETA DE DISCOS
@@ -211,9 +219,9 @@ function actualizarPanel(idx) {
 }
 
 function chartDefaults() {
-  Chart.defaults.color = "#8b93ad";
+  Chart.defaults.color = COLOR_TEXT_MUTED;
   Chart.defaults.font.family = "'IBM Plex Mono', monospace";
-  Chart.defaults.borderColor = "#232f47";
+  Chart.defaults.borderColor = COLOR_GRID;
 }
 chartDefaults();
 
@@ -227,7 +235,7 @@ function crearPie(idx) {
         {
           data: [0, 0, 0],
           backgroundColor: [COLOR_CAPACIDAD, COLOR_SEGURIDAD, COLOR_SINUSAR],
-          borderColor: "#111827",
+          borderColor: COLOR_PANEL_BG,
           borderWidth: 2,
         },
       ],
@@ -278,7 +286,7 @@ function crearBar(idx) {
       scales: {
         x: {
           stacked: true,
-          grid: { color: "#1c2438" },
+          grid: { color: COLOR_GRID_SOFT },
         },
         y: { stacked: true, grid: { display: false } },
       },
