@@ -1,7 +1,13 @@
 /* ============================================================
    ESTADO
    ============================================================ */
-const MAX_BAHIAS = 6;
+const MAX_BAHIAS_DESKTOP = 10;
+const MAX_BAHIAS_COMPACTO = 6;
+const BREAKPOINT_BAHIAS = 900;
+let MAX_BAHIAS =
+  window.innerWidth > BREAKPOINT_BAHIAS
+    ? MAX_BAHIAS_DESKTOP
+    : MAX_BAHIAS_COMPACTO;
 const TAMANOS = [500, 1000, 2000, 3000, 4000, 6000, 8000, 10000];
 let discos = []; // { id, capacidad }
 let nextId = 0;
@@ -258,6 +264,29 @@ function crearBar(idx) {
     },
   });
 }
+
+/* ============================================================
+   RESPONSIVE: MAX_BAHIAS según ancho de pantalla
+   ============================================================ */
+function actualizarMaxBahias() {
+  const nuevoMax =
+    window.innerWidth > BREAKPOINT_BAHIAS
+      ? MAX_BAHIAS_DESKTOP
+      : MAX_BAHIAS_COMPACTO;
+  if (nuevoMax === MAX_BAHIAS) return;
+
+  MAX_BAHIAS = nuevoMax;
+  if (discos.length > MAX_BAHIAS) {
+    discos = discos.slice(0, MAX_BAHIAS);
+  }
+  refrescarTodo();
+}
+
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(actualizarMaxBahias, 150);
+});
 
 /* ============================================================
    EVENTOS
