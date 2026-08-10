@@ -620,6 +620,8 @@ function simularEscritura() {
     writeEls.estado.className = "estado-banner";
   }
 
+  writeEls.select.classList.toggle("has-error", !val.valido);
+
   if (!val.valido) {
     writeEls.msg.innerHTML = `<div class="panel-msg">${val.mensaje}</div>`;
     ultimoLayout = null;
