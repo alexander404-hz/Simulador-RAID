@@ -27,10 +27,11 @@ const paneles = {
   },
 };
 
+/* ============================================================
+   COLORES (leídos desde las variables CSS, ver styles.css :root)
+   ============================================================ */
 function cssVar(name) {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
 const COLOR_CAPACIDAD = cssVar("--teal");
