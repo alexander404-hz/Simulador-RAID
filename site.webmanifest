@@ -1,0 +1,23 @@
+{
+  "name": "Simulador RAID",
+  "short_name": "Sim. RAID",
+  "lang": "es-SV",
+  "dir": "ltr",
+  "start_url": "/Simulador-RAID/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f5",
+  "theme_color": "#1b2540",
+  "icons": [
+    {
+      "src": "assets/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/android-chrome-512x512.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}
