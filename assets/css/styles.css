@@ -71,6 +71,9 @@ p {
 a {
   color: var(--teal);
 }
+a:hover {
+  color: var(--accent);
+}
 button {
   font-family: inherit;
 }
